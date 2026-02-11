@@ -127,6 +127,7 @@ let state = {
   menuOpen: false,
   acceptedTerms: false,
   loading: false,
+  imageUploading: false, // ✅ Nuevo flag específico para subida de imagen
   formData: {
     email: '',
     password: '',
@@ -153,6 +154,13 @@ let state = {
 // Variables para drag and drop del chat IA
 let isDragging = false;
 let offsetX = 0, offsetY = 0;
+
+// ✅ Debouncer para evitar múltiples llamadas
+let debounceTimers = {};
+function debounce(key, func, delay = 300) {
+  clearTimeout(debounceTimers[key]);
+  debounceTimers[key] = setTimeout(func, delay);
+}
 
 // ==================== UTILIDADES ====================
 const showLoading = () => {
@@ -222,14 +230,52 @@ const escapeHtml = (text) => {
   return text.replace(/[&<>"']/g, m => map[m]);
 };
 
-// ✅ Función para convertir imagen a base64
+// ✅ Función mejorada para convertir imagen a base64
 const convertImageToBase64 = (file) => {
   return new Promise((resolve, reject) => {
+    if (state.imageUploading) {
+      reject(new Error('Ya hay una carga en progreso'));
+      return;
+    }
+    
+    state.imageUploading = true;
+    
     const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = () => reject(new Error('Error al leer la imagen'));
+    reader.onload = (e) => {
+      state.imageUploading = false;
+      resolve(e.target.result);
+    };
+    reader.onerror = () => {
+      state.imageUploading = false;
+      reject(new Error('Error al leer la imagen'));
+    };
     reader.readAsDataURL(file);
   });
+};
+
+// ✅ Actualización parcial del DOM (evita re-renders completos)
+const updatePartialDOM = (selector, content) => {
+  const element = document.querySelector(selector);
+  if (element && element.innerHTML !== content) {
+    element.innerHTML = content;
+  }
+};
+
+// ✅ Toggle password sin re-render completo
+const togglePasswordVisibility = (field) => {
+  if (field === 'password') {
+    state.showPassword = !state.showPassword;
+    const input = document.getElementById('login-password') || document.getElementById('signup-password');
+    const icon = document.getElementById('toggle-password');
+    if (input) input.type = state.showPassword ? 'text' : 'password';
+    if (icon) icon.innerHTML = `<i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+  } else {
+    state.showConfirmPassword = !state.showConfirmPassword;
+    const input = document.getElementById('signup-confirm-password');
+    const icon = document.getElementById('toggle-confirm-password');
+    if (input) input.type = state.showConfirmPassword ? 'text' : 'password';
+    if (icon) icon.innerHTML = `<i class="fas ${state.showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+  }
 };
 
 // ==================== FUNCIONES DE AUTENTICACIÓN ====================
@@ -386,15 +432,6 @@ function handleAcceptTerms() {
   render();
 }
 
-function togglePassword(field) {
-  if (field === 'password') {
-    state.showPassword = !state.showPassword;
-  } else {
-    state.showConfirmPassword = !state.showConfirmPassword;
-  }
-  render();
-}
-
 // ==================== FUNCIONES DE VACANTES ====================
 async function loadVacancies() {
   try {
@@ -413,10 +450,16 @@ async function loadVacancies() {
   }
 }
 
-// ✅ Nueva función para manejar subida de imagen (ahora en base64)
+// ✅ Función MEJORADA para manejar subida de imagen (previene múltiples llamadas)
 async function handleImageUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
+  
+  // ✅ Prevenir múltiples cargas
+  if (state.imageUploading) {
+    console.warn('⚠️ [UPLOAD] Carga ya en progreso');
+    return;
+  }
   
   // Validaciones
   if (file.size > 2 * 1024 * 1024) {
@@ -431,26 +474,37 @@ async function handleImageUpload(e) {
     return;
   }
   
-  showLoading();
+  console.log('📤 [UPLOAD] Iniciando conversión a base64...');
+  
   try {
-    // ✅ Convertir a base64
     const base64Image = await convertImageToBase64(file);
     state.formData.imageBase64 = base64Image;
-    console.log('✅ [UPLOAD] Imagen convertida a base64');
+    console.log('✅ [UPLOAD] Imagen convertida exitosamente');
     
-    render();
+    // ✅ Actualización parcial solo del preview
+    const previewContainer = document.querySelector('.image-upload-area');
+    if (previewContainer) {
+      previewContainer.classList.add('has-image');
+      previewContainer.innerHTML = `
+        <label for="image-upload" class="cursor-pointer block">
+          <div class="image-preview-container">
+            <img src="${escapeHtml(base64Image)}" alt="Vista previa">
+          </div>
+        </label>
+      `;
+    }
   } catch (error) {
     console.error('❌ [UPLOAD] Error:', error);
     showModal('error', 'Error al subir imagen', error.message);
     e.target.value = '';
-  } finally {
-    hideLoading();
   }
 }
 
-// ✅ Función de guardado optimizada para base64
+// ✅ Función de guardado optimizada
 async function handleSaveVacancy(e) {
   e.preventDefault();
+  
+  if (state.loading) return;
   
   // Validaciones
   if (!state.user || !state.user.id) {
@@ -481,8 +535,6 @@ async function handleSaveVacancy(e) {
     }
     state.formData.contact_phone = phoneDigits;
   }
-  
-  if (state.loading) return;
   
   showLoading();
   try {
@@ -611,12 +663,19 @@ function toggleAIChat() {
   }
 }
 
+// ✅ Función MEJORADA para enviar mensaje a IA
 async function sendAIMessage() {
   const input = document.getElementById('ai-chat-input');
   const message = input?.value.trim();
   
   if (!message && !state.aiImage) {
     showModal('info', 'Mensaje vacío', 'Escribe algo o sube una imagen');
+    return;
+  }
+  
+  // ✅ Prevenir múltiples envíos
+  if (state.aiLoading) {
+    console.warn('⚠️ [IA] Ya hay una solicitud en progreso');
     return;
   }
   
@@ -640,8 +699,9 @@ async function sendAIMessage() {
       requestData.image = base64;
     }
     
-    console.log('📤 [IA] Enviando request...');
+    console.log('📤 [IA] Enviando request a Edge Function...');
     
+    // ✅ CORRECCIÓN: URL correcta del Edge Function
     const response = await fetch(`${SUPABASE_URL}/functions/v1/autofill-ia`, {
       method: 'POST',
       headers: {
@@ -651,13 +711,16 @@ async function sendAIMessage() {
       body: JSON.stringify(requestData)
     });
     
+    console.log('📥 [IA] Response status:', response.status);
+    
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      console.error('❌ [IA] Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
     }
     
     const data = await response.json();
-    console.log('📥 [IA] Response:', data);
+    console.log('✅ [IA] Response data:', data);
     
     state.aiMessages.push({
       role: 'bot',
@@ -670,10 +733,10 @@ async function sendAIMessage() {
     }
     
   } catch (error) {
-    console.error('❌ [IA] Error al procesar:', error);
+    console.error('❌ [IA] Error completo:', error);
     state.aiMessages.push({
       role: 'bot',
-      content: 'Error: No pude procesar tu solicitud. Por favor intenta nuevamente. 🔄'
+      content: `Error: ${error.message}. Por favor verifica la configuración del Edge Function. 🔄`
     });
   } finally {
     state.aiLoading = false;
@@ -723,9 +786,16 @@ function startAutofill() {
   showModal('success', '¡Formulario rellenado!', 'Revisa los campos y ajusta si es necesario antes de guardar. ✨');
 }
 
+// ✅ Función MEJORADA para subir imagen en IA (previene bucle en Android)
 function handleAIImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
+  
+  // ✅ Prevenir procesamiento doble
+  if (state.aiImage && state.aiImage.name === file.name && state.aiImage.size === file.size) {
+    console.warn('⚠️ [IA] Imagen ya procesada');
+    return;
+  }
   
   if (file.size > 10 * 1024 * 1024) {
     showModal('error', 'Archivo Grande', 'El tamaño máximo es 10MB');
@@ -744,7 +814,24 @@ function handleAIImageUpload(event) {
   const reader = new FileReader();
   reader.onload = (e) => {
     state.aiImagePreview = e.target.result;
-    render();
+    
+    // ✅ Actualización parcial del DOM
+    const fileUploadSection = document.querySelector('.file-upload');
+    if (fileUploadSection && !document.querySelector('.file-preview')) {
+      const previewHTML = `
+        <div class="file-preview">
+          <img src="${escapeHtml(e.target.result)}" alt="Preview" />
+          <button class="remove-file" id="remove-ai-image-btn">×</button>
+        </div>
+      `;
+      fileUploadSection.insertAdjacentHTML('beforeend', previewHTML);
+      
+      // Re-attach event listener
+      const removeBtn = document.getElementById('remove-ai-image-btn');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', removeAIImage);
+      }
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -756,7 +843,8 @@ function removeAIImage() {
   const fileInput = document.querySelector('#ai-image-upload');
   if (fileInput) fileInput.value = '';
   
-  render();
+  const preview = document.querySelector('.file-preview');
+  if (preview) preview.remove();
 }
 
 function toggleChatMinimize() {
@@ -859,6 +947,7 @@ function resetJobForm() {
   state.formData.schedule = '';
   state.formData.work_days = '';
   state.formData.imageBase64 = '';
+  state.imageUploading = false;
 }
 
 // ==================== FUNCIONES DE RENDER ====================
@@ -1436,10 +1525,7 @@ function attachEventListeners() {
     
     const togglePassword = document.getElementById('toggle-password');
     if (togglePassword) {
-      togglePassword.addEventListener('click', () => {
-        state.showPassword = !state.showPassword;
-        render();
-      });
+      togglePassword.addEventListener('click', () => togglePasswordVisibility('password'));
     }
     
     const resetPasswordBtn = document.getElementById('reset-password-btn');
@@ -1490,18 +1576,12 @@ function attachEventListeners() {
     
     const togglePassword = document.getElementById('toggle-password');
     if (togglePassword) {
-      togglePassword.addEventListener('click', () => {
-        state.showPassword = !state.showPassword;
-        render();
-      });
+      togglePassword.addEventListener('click', () => togglePasswordVisibility('password'));
     }
     
     const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
     if (toggleConfirmPassword) {
-      toggleConfirmPassword.addEventListener('click', () => {
-        state.showConfirmPassword = !state.showConfirmPassword;
-        render();
-      });
+      toggleConfirmPassword.addEventListener('click', () => togglePasswordVisibility('confirm'));
     }
     
     const goToLogin = document.getElementById('go-to-login');
@@ -1519,7 +1599,8 @@ function attachEventListeners() {
   if (acceptTermsCheckbox) {
     acceptTermsCheckbox.addEventListener('change', (e) => {
       state.acceptedTerms = e.target.checked;
-      render();
+      const btn = document.getElementById('accept-terms-btn');
+      if (btn) btn.disabled = !e.target.checked;
     });
   }
   
@@ -1589,7 +1670,8 @@ function attachEventListeners() {
     
     const imageUpload = document.getElementById('image-upload');
     if (imageUpload) {
-      imageUpload.addEventListener('change', handleImageUpload);
+      // ✅ Prevenir múltiples eventos en Android
+      imageUpload.addEventListener('change', handleImageUpload, { once: false, passive: true });
     }
     
     const inputCompany = document.getElementById('input-company');
@@ -1671,14 +1753,14 @@ function attachEventListeners() {
     aiChatInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendAIMessage();
+        debounce('send-ai-message', sendAIMessage, 500);
       }
     });
   }
   
   const sendAiMessageBtn = document.getElementById('send-ai-message-btn');
   if (sendAiMessageBtn) {
-    sendAiMessageBtn.addEventListener('click', sendAIMessage);
+    sendAiMessageBtn.addEventListener('click', () => debounce('send-ai-message', sendAIMessage, 500));
   }
   
   const startAutofillBtn = document.getElementById('start-autofill-btn');
@@ -1711,7 +1793,8 @@ function attachEventListeners() {
   
   const aiImageUpload = document.getElementById('ai-image-upload');
   if (aiImageUpload) {
-    aiImageUpload.addEventListener('change', handleAIImageUpload);
+    // ✅ Prevenir múltiples eventos en Android
+    aiImageUpload.addEventListener('change', handleAIImageUpload, { once: false, passive: true });
   }
   
   const removeAiImageBtn = document.getElementById('remove-ai-image-btn');
