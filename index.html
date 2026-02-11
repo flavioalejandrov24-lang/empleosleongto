@@ -20,7 +20,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fade-in{animation:fadeIn .5s ease-out forwards}
 .slide-in{animation:slideIn .3s ease-out forwards}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-window{background:white;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.4);max-width:500px;width:100%;overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+.modal-window{background:white;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.4);max-width:500px;width:100%;overflow-hidden;border:1px solid rgba(255,255,255,.2)}
 .modal-header{background:linear-gradient(135deg,#000 0%,#333 100%);color:white;padding:24px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px}
 .modal-body{padding:28px;line-height:1.6;color:#495057}
 .modal-footer{padding:20px 28px;background:#f8f9fa;display:flex;gap:12px;justify-content:flex-end;border-top:1px solid #e9ecef}
@@ -92,6 +92,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 ::-webkit-scrollbar-track{background:#f1f1f1}
 ::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:6px}
 @media(max-width:768px){.ai-chat-modal{width:95%;max-width:95%}.modal-window{margin:20px}}
+/* Corrección de los botones en móviles */
+.form-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .form-buttons-container {
+    flex-direction: row;
+  }
+}
 </style>
 </head>
 <body>
@@ -99,16 +110,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="modal-root"></div>
 <script>
 console.log('🚀 [INICIO] Cargando aplicación Empleos León GTO...');
-
 // Configuración de Supabase
 const SUPABASE_URL='https://mecrloufrzbfcihioeve.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lY3Jsb3VmcnpiZmNpaGlvZXZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NTM2OTgsImV4cCI6MjA4NjMyOTY5OH0.Gs36EkNHv5vG2CPdrK7XtCnWvX5NYkyPY9moTdezbVA';
 const SUPABASE_REDIRECT_URL='https://flavioalejandrov24-lang.github.io/empleosleongto/';
 const{createClient}=supabase;
 const supabaseClient=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-
 console.log('✅ [SUPABASE] Cliente inicializado');
-
 // Estado centralizado - TODO dentro de state
 let state={
 view:'login',
@@ -144,13 +152,10 @@ aiImage:null,
 aiImagePreview:null,
 aiExtractedData:null
 };
-
 console.log('✅ [ESTADO] Estado inicializado');
-
 // Variables para drag del chat
 let isDragging=false;
 let offsetX=0,offsetY=0;
-
 // Funciones de utilidad
 const showLoading=()=>{
 console.log('⏳ [LOADING] Mostrando loader');
@@ -161,14 +166,12 @@ loader.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9
 loader.innerHTML='<div class="loader"></div>';
 document.body.appendChild(loader);
 };
-
 const hideLoading=()=>{
 console.log('✅ [LOADING] Ocultando loader');
 state.loading=false;
 const loader=document.getElementById('loader-overlay');
 if(loader)loader.remove();
 };
-
 const showModal=(type,title,message)=>{
 console.log(`📢 [MODAL] ${type.toUpperCase()}: ${title} - ${message}`);
 const icons={success:'✓',error:'✕',warning:'⚠',info:'ℹ'};
@@ -202,7 +205,6 @@ if(e.target===modal)modal.remove();
 });
 setTimeout(()=>{if(modal.parentNode)modal.remove();},8000);
 };
-
 // Funciones de autenticación
 async function handleLogin(e){
 e.preventDefault();
@@ -231,7 +233,6 @@ showModal('error','Error de inicio de sesión',error.message||'Correo o contrase
 hideLoading();
 }
 }
-
 async function handleSignup(e){
 e.preventDefault();
 console.log('📝 [SIGNUP] Intentando registrar usuario');
@@ -264,7 +265,6 @@ showModal('error','Error',error.message.includes('already registered')?'Este cor
 hideLoading();
 }
 }
-
 async function handleResetPassword(){
 const email=prompt('Ingresa tu correo electrónico:');
 if(!email)return;
@@ -282,7 +282,6 @@ showModal('error','Error','No se pudo enviar el correo');
 hideLoading();
 }
 }
-
 async function handleLogout(){
 if(!confirm('¿Cerrar sesión?'))return;
 console.log('🚪 [LOGOUT] Cerrando sesión');
@@ -296,9 +295,9 @@ resetJobForm();
 render();
 console.log('✅ [LOGOUT] Sesión cerrada');
 }
-
 async function handleDeleteAccount(){
-if(!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?\nEsta acción NO se puede deshacer.'))return;
+if(!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?
+Esta acción NO se puede deshacer.'))return;
 const conf=prompt('Escribe "ELIMINAR" para confirmar:');
 if(conf!=='ELIMINAR')return;
 console.log('🗑️ [DELETE] Eliminando cuenta del usuario:',state.user?.id);
@@ -330,7 +329,6 @@ showModal('error','Error','No se pudo eliminar');
 hideLoading();
 }
 }
-
 function handleGuestAccess(){
 console.log('👥 [GUEST] Acceso como invitado');
 state.isGuest=true;
@@ -338,7 +336,6 @@ state.view='dashboard';
 loadVacancies();
 render();
 }
-
 function handleAcceptTerms(){
 if(!state.acceptedTerms){
 console.log('❌ [TERMS] Términos no aceptados');
@@ -349,7 +346,6 @@ if(state.user)localStorage.setItem('terms_accepted_'+state.user.id,'true');
 state.view='dashboard';
 render();
 }
-
 function togglePassword(field){
 console.log(`👁️ [PASSWORD] Toggle ${field}`);
 if(field==='password')state.showPassword=!state.showPassword;
@@ -357,7 +353,6 @@ else state.showConfirmPassword=!state.showConfirmPassword;
 const input=document.querySelector(`input[name="${field}"]`);
 if(input)input.type=(field==='password'?state.showPassword:state.showConfirmPassword)?'text':'password';
 }
-
 // Funciones de vacantes
 async function loadVacancies(){
 console.log('📥 [VACANCIES] Cargando vacantes...');
@@ -372,7 +367,6 @@ console.error('❌ [VACANCIES] Error:',error);
 showModal('error','Error','No se pudieron cargar las vacantes');
 }
 }
-
 async function handleImageUpload(e){
 const file=e.target.files[0];
 if(!file)return;
@@ -409,7 +403,6 @@ e.target.value='';
 hideLoading();
 }
 }
-
 async function handleSaveVacancy(e){
 e.preventDefault();
 console.log('💾 [SAVE] Guardando vacante...');
@@ -466,7 +459,6 @@ showModal('error','Error',error.message);
 hideLoading();
 }
 }
-
 async function handleDeleteVacancy(vacancy){
 if(!confirm(`¿Eliminar vacante de ${vacancy.company}?`))return;
 console.log('🗑️ [DELETE] Eliminando vacante ID:',vacancy.id);
@@ -491,7 +483,6 @@ showModal('error','Error','No se pudo eliminar');
 hideLoading();
 }
 }
-
 function handleEditVacancy(vacancy){
 console.log('✏️ [EDIT] Editando vacante ID:',vacancy.id);
 state.editingVacancy=vacancy;
@@ -512,7 +503,6 @@ confirmPassword:''
 state.view='form';
 render();
 }
-
 // Funciones del Chat IA - CORREGIDAS Y CENTRALIZADAS
 function toggleAIChat(){
 console.log('🤖 [IA] Toggle chat:',!state.aiChatOpen);
@@ -525,7 +515,6 @@ content:'¡Hola! ¿Tienes alguna información para compartirme para llenar el fo
 }
 render();
 }
-
 async function sendAIMessage(){
 const input=document.getElementById('ai-chat-input');
 const message=input?.value.trim();
@@ -569,10 +558,11 @@ throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
 }
 const data=await response.json();
 console.log('✅ [IA] Respuesta recibida:',data);
-// Agregar respuesta de la IA
+// Agregar respuesta de la IA con información del modelo
+const modelInfo = data.model ? ` (usando ${data.model})` : '';
 state.aiMessages.push({
 role:'bot',
-content:data.message||'He procesado tu información. Presiona "START" para rellenar el formulario.'
+content:`He procesado tu información${modelInfo}. Presiona "START" para rellenar el formulario.`
 });
 // Guardar datos extraídos
 if(data.vacancyData){
@@ -593,7 +583,6 @@ state.aiImagePreview=null;
 render();
 }
 }
-
 function startAutofill(){
 console.log('🚀 [IA] Iniciando autofill');
 if(!state.aiExtractedData){
@@ -619,7 +608,6 @@ state.aiExtractedData=null;
 showModal('¡Éxito!','Formulario rellenado automáticamente.','success');
 render();
 }
-
 function handleAIImageUpload(event){
 const file=event.target.files[0];
 if(!file)return;
@@ -638,14 +626,12 @@ render();
 };
 reader.readAsDataURL(file);
 }
-
 function removeAIImage(){
 console.log('🗑️ [IA] Eliminando imagen');
 state.aiImage=null;
 state.aiImagePreview=null;
 render();
 }
-
 function toggleChatMinimize(){
 const chat=document.querySelector('.ai-chat-modal');
 if(chat){
@@ -653,7 +639,6 @@ chat.classList.toggle('minimized');
 console.log('🔽 [IA] Chat minimizado:',chat.classList.contains('minimized'));
 }
 }
-
 // Drag para mover el chat
 function startDrag(e){
 isDragging=true;
@@ -665,7 +650,6 @@ offsetY=e.clientY-rect.top;
 chat.style.transition='none';
 console.log('🖱️ [IA] Iniciando drag');
 }
-
 function drag(e){
 if(!isDragging)return;
 const chat=document.querySelector('.ai-chat-modal');
@@ -678,7 +662,6 @@ const maxY=window.innerHeight-chat.offsetHeight;
 chat.style.left=`${Math.max(0,Math.min(x,maxX))}px`;
 chat.style.top=`${Math.max(0,Math.min(y,maxY))}px`;
 }
-
 function stopDrag(){
 if(isDragging){
 isDragging=false;
@@ -689,11 +672,9 @@ chat.style.transition='all 0.3s ease';
 console.log('🖱️ [IA] Drag finalizado');
 }
 }
-
 // Event listeners para drag
 document.addEventListener('mousemove',drag);
 document.addEventListener('mouseup',stopDrag);
-
 // Funciones de formulario
 function cleanForm(){
 console.log('🧹 [FORM] Limpiando formulario');
@@ -701,7 +682,6 @@ resetJobForm();
 render();
 showModal('info','Formulario Limpiado','Todos los campos han sido vaciados');
 }
-
 function cancelForm(){
 console.log('❌ [FORM] Cancelando formulario');
 state.editingVacancy=null;
@@ -709,14 +689,12 @@ state.view='dashboard';
 resetJobForm();
 render();
 }
-
 function resetAuthForm(){
 console.log('🧹 [AUTH] Reset auth form');
 state.formData.email='';
 state.formData.password='';
 state.formData.confirmPassword='';
 }
-
 function resetJobForm(){
 console.log('🧹 [JOB] Reset job form');
 state.formData.company='';
@@ -729,7 +707,6 @@ state.formData.schedule='';
 state.formData.work_days='';
 state.formData.imageUrl='';
 }
-
 // Funciones de renderizado
 function renderLogin(){
 return`
@@ -778,7 +755,6 @@ Crear cuenta nueva
 </div>
 `;
 }
-
 function renderSignup(){
 return`
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -822,7 +798,6 @@ Inicia sesión
 </div>
 `;
 }
-
 function renderTerms(){
 return`
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -875,7 +850,6 @@ He leído y acepto los términos
 </div>
 `;
 }
-
 function renderDashboard(){
 return`
 <div class="min-h-screen">
@@ -978,7 +952,6 @@ ${state.vacancies.map(v=>renderVacancyCard(v)).join('')}
 </div>
 `;
 }
-
 function renderVacancyCard(vacancy){
 const isOwner=state.user&&state.user.id===vacancy.user_id;
 return`
@@ -1062,7 +1035,6 @@ Email
 </div>
 `;
 }
-
 function renderForm(){
 return`
 <div class="min-h-screen py-8">
@@ -1125,17 +1097,17 @@ ${state.formData.imageUrl?`
 <label>Horario</label>
 <textarea rows="2" placeholder="Ej: 09:00 - 18:00, con hora de comida de 14:00 - 15:00" oninput="state.formData.schedule=this.value">${state.formData.schedule}</textarea>
 </div>
-<div class="flex gap-4 pt-4">
-<button type="button" onclick="cancelForm()" class="btn btn-cancel flex-1">
+<div class="form-buttons-container pt-4">
+<button type="button" onclick="cancelForm()" class="btn btn-cancel w-full sm:flex-1">
 <i class="fas fa-times"></i> Cancel
 </button>
-<button type="button" onclick="cleanForm()" class="btn btn-clean flex-1">
+<button type="button" onclick="cleanForm()" class="btn btn-clean w-full sm:flex-1">
 <i class="fas fa-eraser"></i> Clean
 </button>
-<button type="button" onclick="toggleAIChat()" class="btn btn-autofill flex-1">
+<button type="button" onclick="toggleAIChat()" class="btn btn-autofill w-full sm:flex-1">
 <i class="fas fa-robot"></i> Autofill IA
 </button>
-<button type="submit" class="btn btn-save flex-1" ${state.loading?'disabled':''}>
+<button type="submit" class="btn btn-save w-full sm:flex-1" ${state.loading?'disabled':''}>
 ${state.loading?'<i class="fas fa-spinner fa-spin"></i> Guardando...':(state.editingVacancy?'<i class="fas fa-edit"></i> Actualizar':'<i class="fas fa-save"></i> Publicar')}
 </button>
 </div>
@@ -1146,7 +1118,6 @@ ${state.aiChatOpen?renderAIChat():''}
 </div>
 `;
 }
-
 function renderAIChat(){
 return`
 <div class="ai-chat-modal" onmousedown="startDrag(event)">
@@ -1202,7 +1173,6 @@ ${state.aiImagePreview?`
 </div>
 `;
 }
-
 function render(){
 const app=document.getElementById('app');
 if(state.menuOpen&&state.view!=='dashboard')state.menuOpen=false;
@@ -1219,7 +1189,6 @@ app.innerHTML=content;
 window.scrollTo({top:0,behavior:'smooth'});
 console.log(`✅ [RENDER] Vista actual: ${state.view}`);
 }
-
 // Inicialización
 async function init(){
 console.log('🚀 [INIT] Iniciando aplicación...');
@@ -1263,14 +1232,12 @@ loadVacancies();
 console.log('✅ [INIT] Aplicación inicializada completamente');
 render();
 }
-
 // Iniciar cuando el DOM esté listo
 if(document.readyState==='loading'){
 document.addEventListener('DOMContentLoaded',init);
 }else{
 init();
 }
-
 console.log('✅ [CARGA] Script cargado completamente');
 </script>
 </body>
