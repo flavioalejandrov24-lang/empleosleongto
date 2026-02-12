@@ -22,17 +22,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes guestGlow{0%,100%{text-shadow:0 0 10px rgba(34,197,94,0.6),0 0 20px rgba(34,197,94,0.4)}50%{text-shadow:0 0 20px rgba(34,197,94,0.8),0 0 30px rgba(34,197,94,0.6)}}
 .fade-in{animation:fadeIn .5s ease-out forwards}
 .slide-in{animation:slideIn .3s ease-out forwards}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-window{background:white;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.4);max-width:500px;width:100%;overflow:hidden;border:1px solid rgba(255,255,255,.2);animation:modalPop .3s ease-out}
-.modal-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:24px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px}
-.modal-body{padding:28px;line-height:1.6;color:#495057}
-.modal-footer{padding:20px 28px;background:#f8f9fa;display:flex;gap:12px;justify-content:flex-end;border-top:1px solid #e9ecef}
-.btn{padding:12px 28px;border-radius:10px;font-weight:600;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);border:none;font-size:14px;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+
+/* ==================== MODAL ESTILO WINDOWS MODERNO ==================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-window{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:440px;width:100%;overflow:hidden;border:1px solid rgba(0,0,0,.1);animation:modalPop .25s cubic-bezier(.25,.46,.45,.94)}
+.modal-header{background:#fff;color:#1f2937;padding:20px 24px 16px;display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid #e5e7eb}
+.modal-header i{font-size:24px;color:#667eea;margin-top:2px}
+.modal-header .header-text{flex:1}
+.modal-header .header-text h3{font-size:16px;font-weight:600;color:#1f2937;margin:0 0 4px 0}
+.modal-header .header-text p{font-size:14px;color:#6b7280;margin:0}
+.modal-body{padding:20px 24px;line-height:1.6;color:#374151;font-size:14px}
+.modal-footer{padding:16px 24px;background:#f9fafb;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #e5e7eb}
+
+.btn{padding:10px 24px;border-radius:6px;font-weight:600;cursor:pointer;transition:all .2s ease;border:none;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;box-shadow:0 4px 14px rgba(102,126,234,.4)}
-.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.5)}
+.btn-primary{background:#667eea;color:white;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.btn-primary:hover:not(:disabled){background:#5568d3}
+.btn-secondary{background:#e5e7eb;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.btn-secondary:hover:not(:disabled){background:#d1d5db}
 .btn-new-vacancy{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;box-shadow:0 4px 14px rgba(16,185,129,.4);font-weight:700;padding:10px 20px;border-radius:12px}
 .btn-new-vacancy:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.5)}
+.btn-calendar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;box-shadow:0 4px 14px rgba(102,126,234,.4);font-weight:700;padding:10px 20px;border-radius:12px}
+.btn-calendar:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.5)}
 .btn-cancel{background:linear-gradient(135deg,#dc3545 0%,#c82333 100%);color:white;box-shadow:0 4px 14px rgba(220,53,69,.3);font-weight:700}
 .btn-cancel:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(220,53,69,.4)}
 .btn-outline{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:white;box-shadow:0 4px 14px rgba(59,130,246,.4);border:none}
@@ -57,6 +68,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .loader{border:4px solid rgba(102,126,234,.2);border-top:4px solid #667eea;border-radius:50%;width:50px;height:50px;animation:spin .8s linear infinite;margin:20px auto}
 .line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ==================== CALENDAR MODAL ==================== */
+.calendar-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.3);z-index:10001;padding:24px;max-width:400px;width:90%;animation:modalPop .3s ease-out}
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e5e7eb}
+.calendar-header h3{font-size:18px;font-weight:700;color:#1f2937}
+.calendar-nav{display:flex;gap:12px;align-items:center}
+.calendar-nav button{background:#f3f4f6;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;transition:all .2s}
+.calendar-nav button:hover{background:#e5e7eb}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}
+.calendar-day{text-align:center;padding:12px 8px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
+.calendar-day.header{color:#6b7280;font-size:12px;font-weight:700;cursor:default;padding:8px}
+.calendar-day:not(.header):hover{background:#f3f4f6}
+.calendar-day.selected{background:#667eea;color:white}
+.calendar-day.today{border:2px solid #667eea}
+.calendar-day.disabled{color:#d1d5db;cursor:not-allowed}
+.calendar-day.disabled:hover{background:transparent}
+.calendar-actions{display:flex;gap:12px;margin-top:20px;padding-top:16px;border-top:2px solid #e5e7eb}
+.calendar-actions button{flex:1}
+
 .ai-chat-modal{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:400px;max-height:600px;z-index:9999;animation:slideUp .4s ease-out;background:white;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);border:2px solid rgba(0,0,0,.2)}
 .ai-chat-header{background:linear-gradient(135deg,#1f2937 0%,#0f172a 100%);color:#FFD700;padding:16px 20px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;cursor:move;font-weight:700;font-size:18px}
 .ai-chat-header h3{margin:0;color:#FFD700}
@@ -105,13 +135,14 @@ header.top-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);box
 header.top-header h1{color:white;text-shadow:0 2px 8px rgba(0,0,0,.2)}
 header.top-header p{color:rgba(255,255,255,.85)}
 .guest-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(34,197,94,.3)}
-
-/* === AJUSTES DE ESTILO SOLICITADOS === */
 .vacancy-card .card-content { margin-top: -8px; }
-.vacancy-card .card-content h3 { font-size: 1.25rem; /* text-xl ≈20px */ }
-.vacancy-card .card-content .job-title { font-size: 1rem; /* text-base ≈16px, -2px respecto a text-lg */ font-weight: 600; }
+.vacancy-card .card-content h3 { font-size: 1.25rem; }
+.vacancy-card .card-content .job-title { font-size: 1rem; font-weight: 600; }
 .vacancy-card .card-content .description { min-height: 100px; }
 .dashboard-section-title { color: white !important; }
+
+/* ==================== HEADER BUTTONS FIX ==================== */
+.header-action-buttons{display:flex;gap:12px;align-items:center}
 </style>
 </head>
 <body>
@@ -131,6 +162,8 @@ view: 'login',
 user: null,
 isGuest: false,
 vacancies: [],
+filteredVacancies: [],
+dateFilter: null,
 editingVacancy: null,
 showPassword: false,
 showConfirmPassword: false,
@@ -138,6 +171,9 @@ menuOpen: false,
 acceptedTerms: false,
 loading: false,
 isRendering: false,
+calendarOpen: false,
+calendarMonth: new Date().getMonth(),
+calendarYear: new Date().getFullYear(),
 formData: {
 email: '',
 password: '',
@@ -158,7 +194,8 @@ aiLoading: false,
 aiImage: null,
 aiImagePreview: null,
 aiExtractedData: null,
-chatMinimized: false
+chatMinimized: false,
+isLoggingOut: false
 };
 // ==================== UTILIDADES ====================
 const showLoading = () => {
@@ -175,38 +212,180 @@ state.loading = false;
 const loader = document.getElementById('loader-overlay');
 if (loader) loader.remove();
 };
-const showModal = (type, title, message) => {
+
+// ==================== MODAL ESTILO WINDOWS ====================
+const showModal = (type, title, message, onConfirm = null) => {
 const modal = document.createElement('div');
 modal.className = 'modal-overlay';
-const colors = {
-success: '#16a34a',
-error: '#dc2626',
-warning: '#d97706',
-info: '#2563eb'
+const icons = {
+success: 'fa-check-circle',
+error: 'fa-exclamation-circle',
+warning: 'fa-exclamation-triangle',
+info: 'fa-info-circle',
+question: 'fa-question-circle'
 };
+const colors = {
+success: '#22c55e',
+error: '#ef4444',
+warning: '#f59e0b',
+info: '#3b82f6',
+question: '#667eea'
+};
+const isQuestion = type === 'question';
 modal.innerHTML = `
 <div class="modal-window">
-<div class="modal-header" style="background:${colors[type]}">
-<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-<span>${escapeHtml(title)}</span>
+<div class="modal-header">
+<i class="fas ${icons[type]}" style="color:${colors[type]}"></i>
+<div class="header-text">
+<h3>${escapeHtml(title)}</h3>
+</div>
 </div>
 <div class="modal-body">${escapeHtml(message)}</div>
 <div class="modal-footer">
-<button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">
-<i class="fas fa-check"></i> Aceptar
-</button>
+${isQuestion ? `
+<button class="btn btn-secondary modal-cancel">Cancelar</button>
+<button class="btn btn-primary modal-confirm">Aceptar</button>
+` : `
+<button class="btn btn-primary modal-ok">Aceptar</button>
+`}
 </div>
 </div>
 `;
 document.getElementById('modal-root').appendChild(modal);
-modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-setTimeout(() => modal.remove(), 8000);
+if (isQuestion) {
+modal.querySelector('.modal-cancel').onclick = () => modal.remove();
+modal.querySelector('.modal-confirm').onclick = () => {
+modal.remove();
+if (onConfirm) onConfirm();
 };
+} else {
+modal.querySelector('.modal-ok').onclick = () => modal.remove();
+setTimeout(() => modal.remove(), 8000);
+}
+modal.onclick = (e) => { 
+if (e.target === modal && !isQuestion) modal.remove(); 
+};
+};
+
 const escapeHtml = (text) => {
 if (!text) return '';
 const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
 return String(text).replace(/[&<>"']/g, m => map[m]);
 };
+
+// ==================== CALENDARIO ====================
+function openCalendar() {
+state.calendarOpen = true;
+state.calendarMonth = new Date().getMonth();
+state.calendarYear = new Date().getFullYear();
+render();
+}
+
+function closeCalendar() {
+state.calendarOpen = false;
+render();
+}
+
+function changeMonth(delta) {
+state.calendarMonth += delta;
+if (state.calendarMonth > 11) {
+state.calendarMonth = 0;
+state.calendarYear++;
+} else if (state.calendarMonth < 0) {
+state.calendarMonth = 11;
+state.calendarYear--;
+}
+render();
+}
+
+function selectDate(year, month, day) {
+const date = new Date(year, month, day);
+state.dateFilter = date;
+filterVacanciesByDate();
+closeCalendar();
+showModal('success', 'Filtro aplicado', `Mostrando vacantes del ${day}/${month + 1}/${year}`);
+}
+
+function clearDateFilter() {
+state.dateFilter = null;
+state.filteredVacancies = [...state.vacancies];
+closeCalendar();
+render();
+showModal('info', 'Filtro eliminado', 'Mostrando todas las vacantes');
+}
+
+function filterVacanciesByDate() {
+if (!state.dateFilter) {
+state.filteredVacancies = [...state.vacancies];
+return;
+}
+const filterDate = state.dateFilter.toLocaleDateString('es-MX');
+state.filteredVacancies = state.vacancies.filter(v => {
+if (!v.publication_date) return false;
+const vacDate = new Date(v.created_at).toLocaleDateString('es-MX');
+return vacDate === filterDate;
+});
+render();
+}
+
+function renderCalendar() {
+if (!state.calendarOpen) return '';
+const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const firstDay = new Date(state.calendarYear, state.calendarMonth, 1).getDay();
+const daysInMonth = new Date(state.calendarYear, state.calendarMonth + 1, 0).getDate();
+const today = new Date();
+const isCurrentMonth = today.getMonth() === state.calendarMonth && today.getFullYear() === state.calendarYear;
+let calendarHTML = `
+<div class="modal-overlay" onclick="if(event.target === this) closeCalendar()">
+<div class="calendar-modal">
+<div class="calendar-header">
+<h3><i class="fas fa-calendar-alt mr-2"></i>${monthNames[state.calendarMonth]} ${state.calendarYear}</h3>
+<div class="calendar-nav">
+<button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+<button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+</div>
+</div>
+<div class="calendar-grid">
+<div class="calendar-day header">D</div>
+<div class="calendar-day header">L</div>
+<div class="calendar-day header">M</div>
+<div class="calendar-day header">M</div>
+<div class="calendar-day header">J</div>
+<div class="calendar-day header">V</div>
+<div class="calendar-day header">S</div>
+`;
+for (let i = 0; i < firstDay; i++) {
+calendarHTML += '<div class="calendar-day disabled"></div>';
+}
+for (let day = 1; day <= daysInMonth; day++) {
+const isToday = isCurrentMonth && day === today.getDate();
+const isSelected = state.dateFilter && 
+state.dateFilter.getDate() === day && 
+state.dateFilter.getMonth() === state.calendarMonth &&
+state.dateFilter.getFullYear() === state.calendarYear;
+calendarHTML += `
+<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" 
+onclick="selectDate(${state.calendarYear}, ${state.calendarMonth}, ${day})">
+${day}
+</div>
+`;
+}
+calendarHTML += `
+</div>
+<div class="calendar-actions">
+<button class="btn btn-secondary" onclick="clearDateFilter()">
+<i class="fas fa-times"></i> Limpiar
+</button>
+<button class="btn btn-primary" onclick="closeCalendar()">
+<i class="fas fa-check"></i> Cerrar
+</button>
+</div>
+</div>
+</div>
+`;
+return calendarHTML;
+}
+
 // ==================== RESETEO COMPLETO ====================
 function resetCompleteState() {
 console.log('🔄 Reseteando estado completo...');
@@ -214,16 +393,20 @@ state.user = null;
 state.isGuest = false;
 state.view = 'login';
 state.vacancies = [];
+state.filteredVacancies = [];
+state.dateFilter = null;
 state.editingVacancy = null;
 state.showPassword = false;
 state.showConfirmPassword = false;
 state.menuOpen = false;
 state.acceptedTerms = false;
 state.loading = false;
+state.isLoggingOut = false;
 resetAuthForm();
 resetJobForm();
 clearAIData();
 }
+
 // ==================== AUTENTICACIÓN ====================
 async function handleLogin(e) {
 e.preventDefault();
@@ -246,6 +429,7 @@ showModal('error', 'Error de inicio de sesión', error.message || 'Verifica tus 
 hideLoading();
 }
 }
+
 async function handleSignup(e) {
 e.preventDefault();
 if (state.loading) return;
@@ -276,26 +460,61 @@ showModal('error', 'Error', error.message);
 hideLoading();
 }
 }
+
 async function handleLogout() {
-if (!confirm('¿Cerrar sesión?')) return;
+if (state.isLoggingOut) {
+console.log('⏸️ Ya hay un logout en proceso');
+return;
+}
+showModal('question', 'Cerrar sesión', '¿Estás seguro de que deseas cerrar sesión?', async () => {
 console.log('🚪 Cerrando sesión...');
+state.isLoggingOut = true;
 showLoading();
 try {
-resetCompleteState();
 await supabaseClient.auth.signOut();
-console.log('✅ Sesión cerrada');
+resetCompleteState();
+console.log('✅ Sesión cerrada exitosamente');
 render();
 } catch (error) {
 console.error('❌ Error logout:', error);
 showModal('error', 'Error', 'Hubo un problema al cerrar sesión');
+state.isLoggingOut = false;
 } finally {
 hideLoading();
 }
+});
 }
+
 async function handleDeleteAccount() {
-if (!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?')) return;
-const conf = prompt('Escribe "ELIMINAR" para confirmar:');
-if (conf !== 'ELIMINAR') return;
+showModal('question', 'Eliminar cuenta', '¿ELIMINAR tu cuenta y TODAS tus vacantes? Esta acción no se puede deshacer.', () => {
+const modal = document.createElement('div');
+modal.className = 'modal-overlay';
+modal.innerHTML = `
+<div class="modal-window">
+<div class="modal-header">
+<i class="fas fa-exclamation-triangle" style="color:#ef4444"></i>
+<div class="header-text">
+<h3>Confirmación final</h3>
+</div>
+</div>
+<div class="modal-body">
+<p style="margin-bottom:12px">Escribe <strong>ELIMINAR</strong> para confirmar:</p>
+<input type="text" id="delete-confirm-input" style="width:100%;padding:10px;border:2px solid #e5e7eb;border-radius:6px;font-size:14px" placeholder="ELIMINAR">
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+<button class="btn btn-primary" style="background:#ef4444" id="confirm-delete-btn">Eliminar</button>
+</div>
+</div>
+`;
+document.getElementById('modal-root').appendChild(modal);
+document.getElementById('confirm-delete-btn').onclick = async () => {
+const input = document.getElementById('delete-confirm-input').value;
+if (input !== 'ELIMINAR') {
+showModal('error', 'Error', 'Debes escribir ELIMINAR para confirmar');
+return;
+}
+modal.remove();
 showLoading();
 try {
 const { data: userVacancies } = await supabaseClient
@@ -318,14 +537,16 @@ showModal('error', 'Error', 'No se pudo eliminar la cuenta');
 } finally {
 hideLoading();
 }
+};
+});
 }
+
 async function handleGuestAccess() {
 console.log('👤 Acceso como invitado...');
 showLoading();
 try {
 state.isGuest = true;
 state.view = 'dashboard';
-// Cargar vacantes públicas (sin autenticación)
 await loadVacancies();
 console.log('✅ Acceso invitado exitoso. Vacantes cargadas:', state.vacancies.length);
 render();
@@ -340,6 +561,7 @@ render();
 hideLoading();
 }
 }
+
 function handleAcceptTerms() {
 if (!state.acceptedTerms) {
 showModal('warning', 'Términos requeridos', 'Debes aceptar los términos');
@@ -351,6 +573,7 @@ localStorage.setItem('terms_accepted_' + state.user.id, 'true');
 state.view = 'dashboard';
 render();
 }
+
 // ==================== VACANTES ====================
 async function loadVacancies() {
 console.log('📥 Cargando vacantes...');
@@ -361,13 +584,18 @@ const { data, error } = await supabaseClient
 .order('created_at', { ascending: false });
 if (error) throw error;
 state.vacancies = data || [];
+state.filteredVacancies = [...state.vacancies];
+if (state.dateFilter) {
+filterVacanciesByDate();
+}
 console.log('✅ Vacantes cargadas:', state.vacancies.length);
 } catch (error) {
 console.error('❌ Error loading vacancies:', error);
 state.vacancies = [];
-// No mostramos modal de error aquí para no molestar al usuario
+state.filteredVacancies = [];
 }
 }
+
 async function handleImageUpload(e) {
 const file = e.target.files?.[0];
 if (!file) return;
@@ -394,6 +622,7 @@ showModal('error', 'Error', 'No se pudo leer la imagen');
 e.target.value = '';
 }
 }
+
 async function handleSaveVacancy(e) {
 e.preventDefault();
 if (state.loading) return;
@@ -446,9 +675,11 @@ showModal('error', 'Error', error.message || 'No se pudo guardar');
 hideLoading();
 }
 }
+
 async function handleDeleteVacancy(vacancyId) {
 const vacancy = state.vacancies.find(v => v.id === vacancyId);
-if (!vacancy || !confirm(`¿Eliminar vacante de ${vacancy.company}?`)) return;
+if (!vacancy) return;
+showModal('question', 'Eliminar vacante', `¿Eliminar vacante de ${vacancy.company}?`, async () => {
 showLoading();
 try {
 const { error } = await supabaseClient.from('vacancies').delete().eq('id', vacancy.id);
@@ -462,7 +693,9 @@ showModal('error', 'Error', 'No se pudo eliminar');
 } finally {
 hideLoading();
 }
+});
 }
+
 function handleEditVacancy(vacancyId) {
 const vacancy = state.vacancies.find(v => v.id === vacancyId);
 if (!vacancy) return;
@@ -485,6 +718,7 @@ clearAIData();
 state.view = 'form';
 render();
 }
+
 // ==================== IA ====================
 function toggleAIChat() {
 state.aiChatOpen = !state.aiChatOpen;
@@ -496,6 +730,7 @@ content: '¡Hola! Envíame una imagen o describe la vacante y te ayudo a llenar 
 }
 render();
 }
+
 async function sendAIMessage() {
 const input = document.getElementById('ai-chat-input');
 const message = input?.value.trim();
@@ -556,6 +791,7 @@ if (msgs) msgs.scrollTop = msgs.scrollHeight;
 }, 100);
 }
 }
+
 function startAutofill() {
 if (!state.aiExtractedData) {
 showModal('info', 'Sin datos', 'Primero envía información para procesar');
@@ -576,6 +812,7 @@ state.aiExtractedData = null;
 render();
 showModal('success', '¡Formulario rellenado!', 'Revisa y ajusta antes de guardar ✨');
 }
+
 function handleAIImageUpload(event) {
 const file = event.target.files?.[0];
 if (!file) return;
@@ -592,11 +829,13 @@ render();
 };
 reader.readAsDataURL(file);
 }
+
 function removeAIImage() {
 state.aiImage = null;
 state.aiImagePreview = null;
 render();
 }
+
 function clearAIData() {
 state.aiChatOpen = false;
 state.aiMessages = [];
@@ -606,26 +845,32 @@ state.aiImagePreview = null;
 state.aiExtractedData = null;
 state.chatMinimized = false;
 }
+
 // ==================== FORMULARIO ====================
 function cleanForm() {
-if (!confirm('¿Limpiar todos los campos?')) return;
+showModal('question', 'Limpiar formulario', '¿Limpiar todos los campos?', () => {
 resetJobForm();
 clearAIData();
 render();
+});
 }
+
 function cancelForm() {
-if (!confirm('¿Cancelar? Los cambios se perderán')) return;
+showModal('question', 'Cancelar', '¿Cancelar? Los cambios se perderán', () => {
 state.editingVacancy = null;
 state.view = 'dashboard';
 resetJobForm();
 clearAIData();
 render();
+});
 }
+
 function resetAuthForm() {
 state.formData.email = '';
 state.formData.password = '';
 state.formData.confirmPassword = '';
 }
+
 function resetJobForm() {
 state.formData.company = '';
 state.formData.job_title = '';
@@ -637,6 +882,7 @@ state.formData.schedule = '';
 state.formData.work_days = '';
 state.formData.imageBase64 = '';
 }
+
 // ==================== RENDER ====================
 function render() {
 if (state.isRendering) {
@@ -669,11 +915,12 @@ break;
 default:
 content = renderLogin();
 }
-app.innerHTML = content;
+app.innerHTML = content + renderCalendar();
 attachEvents();
 window.scrollTo({ top: 0, behavior: 'smooth' });
 state.isRendering = false;
 }
+
 function renderLogin() {
 return `
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -714,6 +961,7 @@ ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Iniciando...' : '<i cl
 </div>
 `;
 }
+
 function renderSignup() {
 return `
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -753,6 +1001,7 @@ ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Creando...' : '<i clas
 </div>
 `;
 }
+
 function renderTerms() {
 return `
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -782,9 +1031,11 @@ return `
 </div>
 `;
 }
+
 function renderDashboard() {
-const userVacancies = state.user ? state.vacancies.filter(v => v.user_id === state.user.id) : [];
-const otherVacancies = state.user ? state.vacancies.filter(v => v.user_id !== state.user.id) : state.vacancies;
+const displayVacancies = state.filteredVacancies;
+const userVacancies = state.user ? displayVacancies.filter(v => v.user_id === state.user.id) : [];
+const otherVacancies = state.user ? displayVacancies.filter(v => v.user_id !== state.user.id) : displayVacancies;
 return `
 <div class="min-h-screen">
 <header class="bg-white shadow-lg sticky top-0 z-50 top-header">
@@ -794,7 +1045,7 @@ return `
 <div class="text-4xl">💼</div>
 <div>
 <h1 class="text-2xl font-black">Empleos León GTO</h1>
-<p class="text-sm">${state.vacancies.length} vacantes disponibles</p>
+<p class="text-sm">${displayVacancies.length} vacante${displayVacancies.length !== 1 ? 's' : ''} ${state.dateFilter ? 'filtrada' + (displayVacancies.length !== 1 ? 's' : '') : 'disponible' + (displayVacancies.length !== 1 ? 's' : '')}</p>
 </div>
 </div>
 <div class="flex items-center gap-4">
@@ -807,15 +1058,20 @@ Modo Invitado
 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
 </button>
 ` : state.user ? `
+<div class="header-action-buttons">
 <button id="new-vacancy" class="btn btn-new-vacancy">
-<i class="fas fa-plus"></i> + 📆
+<i class="fas fa-plus"></i> Nueva
 </button>
+<button id="calendar-btn" class="btn btn-calendar">
+<i class="fas fa-calendar-alt"></i> ${state.dateFilter ? 'Filtrado' : 'Filtrar'}
+</button>
+</div>
 <div class="relative">
 <button id="user-menu" class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center">
 <i class="fas fa-user"></i>
 </button>
 ${state.menuOpen ? `
-<div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2">
+<div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 z-50">
 <div class="px-4 py-2 border-b">
 <p class="text-xs text-gray-500">Sesión</p>
 <p class="text-sm font-semibold truncate">${escapeHtml(state.user.email)}</p>
@@ -864,6 +1120,14 @@ ${state.isGuest ? `
 </button>
 ` : ''}
 </div>
+` : displayVacancies.length === 0 && state.dateFilter ? `
+<div class="text-center py-16">
+<div class="text-6xl mb-4">🔍</div>
+<p class="text-xl text-gray-600">No hay vacantes para la fecha seleccionada</p>
+<button onclick="clearDateFilter()" class="btn btn-primary mt-4">
+<i class="fas fa-times"></i> Quitar Filtro
+</button>
+</div>
 ` : otherVacancies.length === 0 && !state.isGuest ? `
 <div class="text-center py-16">
 <div class="text-6xl mb-4">🎉</div>
@@ -879,6 +1143,7 @@ ${otherVacancies.map(v => renderVacancyCard(v, false)).join('')}
 </div>
 `;
 }
+
 function renderVacancyCard(vacancy, isOwner) {
 return `
 <div class="vacancy-card">
@@ -916,6 +1181,7 @@ ${isOwner ? `
 </div>
 `;
 }
+
 function renderForm() {
 return `
 <div class="min-h-screen py-8">
@@ -1002,6 +1268,7 @@ ${state.aiChatOpen ? renderAIChat() : ''}
 </div>
 `;
 }
+
 function renderAIChat() {
 return `
 <div class="ai-chat-modal ${state.chatMinimized ? 'minimized' : ''}">
@@ -1031,7 +1298,7 @@ ${state.aiImagePreview ? `
 </div>
 ` : ''}
 </div>
-<textarea id="ai-input" placeholder="Describe la vacante..." rows="3"></textarea>
+<textarea id="ai-chat-input" placeholder="Describe la vacante..." rows="3"></textarea>
 <div class="ai-chat-actions">
 <button id="send-ai" class="btn-send" ${state.aiLoading ? 'disabled' : ''}>
 <i class="fas fa-paper-plane"></i> Enviar
@@ -1047,6 +1314,7 @@ ${state.aiImagePreview ? `
 </div>
 `;
 }
+
 // ==================== EVENTOS ====================
 function attachEvents() {
 // Login
@@ -1099,6 +1367,7 @@ resetJobForm();
 clearAIData();
 render();
 });
+document.getElementById('calendar-btn')?.addEventListener('click', openCalendar);
 document.getElementById('user-menu')?.addEventListener('click', () => {
 state.menuOpen = !state.menuOpen;
 render();
@@ -1138,7 +1407,7 @@ document.getElementById('clean-btn')?.addEventListener('click', cleanForm);
 document.getElementById('ai-btn')?.addEventListener('click', toggleAIChat);
 }
 // AI Chat
-document.getElementById('ai-input')?.addEventListener('keypress', (e) => {
+document.getElementById('ai-chat-input')?.addEventListener('keypress', (e) => {
 if (e.key === 'Enter' && !e.shiftKey) {
 e.preventDefault();
 sendAIMessage();
@@ -1163,6 +1432,7 @@ render();
 document.getElementById('ai-img')?.addEventListener('change', handleAIImageUpload);
 document.getElementById('remove-ai-img')?.addEventListener('click', removeAIImage);
 }
+
 // ==================== INIT ====================
 async function init() {
 console.log('🚀 Inicializando...');
@@ -1177,6 +1447,10 @@ await loadVacancies();
 }
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
 console.log('🔐 Auth:', event);
+if (state.isLoggingOut && event === 'SIGNED_OUT') {
+console.log('✅ Logout completado - estado ya reseteado');
+return;
+}
 if (event === 'SIGNED_OUT' && !state.user) {
 console.log('⏭️ SIGNED_OUT ignorado - ya procesado');
 return;
@@ -1191,12 +1465,10 @@ await loadVacancies();
 hideLoading();
 render();
 showModal('success', '¡Bienvenido!', 'Has iniciado sesión correctamente');
-} else if (event === 'SIGNED_OUT') {
-if (state.user) {
-console.log('🔄 SIGNED_OUT detectado - reseteando estado');
+} else if (event === 'SIGNED_OUT' && state.user && !state.isLoggingOut) {
+console.log('🔄 SIGNED_OUT inesperado detectado - reseteando estado');
 resetCompleteState();
 render();
-}
 }
 });
 supabaseClient
@@ -1213,6 +1485,14 @@ console.error('❌ Error init:', error);
 render();
 }
 }
+
+// Exponer funciones globales necesarias
+window.openCalendar = openCalendar;
+window.closeCalendar = closeCalendar;
+window.changeMonth = changeMonth;
+window.selectDate = selectDate;
+window.clearDateFilter = clearDateFilter;
+
 if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', init);
 } else {
