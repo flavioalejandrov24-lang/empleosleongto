@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Portal de empleos en León, Guanajuato - Encuentra oportunidades laborales">
 <title>Empleos León GTO - Portal de Vacantes</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -28,21 +28,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;box-shadow:0 4px 14px rgba(102,126,234,.4)}
 .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.5)}
-.btn-new-vacancy{background:linear-gradient(135deg,#10b981 0%,#ffffff 100%);color:#065f46;box-shadow:0 4px 14px rgba(16,185,129,.4);font-weight:700;padding:12px 20px;border-radius:12px;white-space:nowrap;min-width:180px}
+.btn-new-vacancy{background:linear-gradient(135deg,#10b981 0%,#ffffff 100%);color:#065f46;box-shadow:0 4px 14px rgba(16,185,129,.4);font-weight:700;padding:10px 20px;border-radius:12px;white-space:nowrap}
 .btn-new-vacancy:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.5)}
-@media (max-width:640px){.btn-new-vacancy{padding:10px 16px;font-size:13px;min-width:150px;width:100%}}
+@media (max-width:640px){.btn-new-vacancy{padding:8px 16px;font-size:12px}}
 .btn-cancel{background:linear-gradient(135deg,#dc3545 0%,#c82333 100%);color:white;box-shadow:0 4px 14px rgba(220,53,69,.3);font-weight:700}
 .btn-cancel:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(220,53,69,.4)}
-.btn-outline{background:linear-gradient(135deg,#2563eb 0%,#ffffff 100%);border:2px solid #2563eb;color:#ffffff;font-weight:700}
-.btn-outline:hover:not(:disabled){background:linear-gradient(135deg,#1d4ed8 0%,#bfdbfe 100%);transform:translateY(-2px)}
+.btn-outline{background:linear-gradient(135deg,white 0%,#f8f9fa 100%);border:2px solid #667eea;color:#667eea}
+.btn-outline:hover:not(:disabled){background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white}
 .btn-autofill{background:linear-gradient(135deg,#000 0%,#333 100%);color:#FFD700;box-shadow:0 4px 14px rgba(0,0,0,.4);border:2px solid rgba(255,215,0,.3)}
 .btn-autofill:hover:not(:disabled){background:linear-gradient(135deg,#1a1a1a 0%,#444 100%);transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.5)}
 .btn-clean{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#667eea;border:2px solid #667eea}
 .btn-clean:hover:not(:disabled){background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;transform:translateY(-2px)}
 .btn-save{background:linear-gradient(135deg,#28a745 0%,#20c997 100%);color:white;box-shadow:0 4px 14px rgba(40,167,69,.3)}
 .btn-save:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(40,167,69,.4)}
-.btn-edit{background:linear-gradient(135deg,#10b981 0%,#ffffff 100%);color:#065f46;border:2px solid #10b981;font-weight:700}
-.btn-edit:hover:not(:disabled){background:linear-gradient(135deg,#059669 0%,#dcfce7 100%);transform:translateY(-2px)}
 .input-group{position:relative;margin-bottom:20px}
 .input-group input,.input-group textarea,.input-group select{width:100%;padding:14px 16px;border:2px solid #e9ecef;border-radius:10px;font-size:14px;transition:all .2s;font-family:inherit}
 .input-group input:focus,.input-group textarea:focus,.input-group select:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 4px rgba(102,126,234,.1)}
@@ -100,8 +98,131 @@ textarea{box-shadow:0 2px 6px rgba(0,0,0,0.1)}
 .image-upload-area{border:2px dashed #d1d5db;border-radius:12px;padding:40px;text-align:center;background:#f9fafb;transition:all .3s ease;cursor:pointer}
 .image-upload-area:hover{border-color:#667eea;background:#f3f4f6}
 .image-upload-area.has-image{padding:0;border:none}
-.header-custom{background:linear-gradient(135deg,#667eea 0%,#ffffff 100%);box-shadow:0 4px 20px rgba(102,126,234,.3)}
-.section-title{color:white;text-shadow:0 2px 4px rgba(0,0,0,.2)}
+
+/* ========== ESTILOS MEJORADOS - VENTANAS WINDOWS ========== */
+.windows-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.windows-modal{background:linear-gradient(145deg,#f8f9fa 0%,#ffffff 100%);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3),0 0 0 1px rgba(0,0,0,.1);max-width:500px;width:100%;overflow:hidden;transform:scale(0.95);animation:modalPop .3s ease-out forwards;border:1px solid rgba(255,255,255,.5)}
+@keyframes modalPop{from{transform:scale(0.95);opacity:0}to{transform:scale(1);opacity:1}}
+.windows-modal-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:700;font-size:18px;border-bottom:3px solid rgba(255,255,255,.3)}
+.windows-modal-header .modal-title{display:flex;align-items:center;gap:12px}
+.windows-modal-header .modal-title i{font-size:24px}
+.windows-modal-header .close-modal{background:rgba(255,255,255,.2);border:none;color:white;width:36px;height:36px;border-radius:8px;cursor:pointer;transition:all .3s ease;font-size:16px;font-weight:700}
+.windows-modal-header .close-modal:hover{background:rgba(255,255,255,.3);transform:rotate(90deg)}
+.windows-modal-body{padding:32px 28px;line-height:1.7;color:#333;background:linear-gradient(to bottom,#ffffff 0%,#fafafa 100%)}
+.windows-modal-body p{margin-bottom:16px;font-size:15px}
+.windows-modal-body .info-icon{display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-size:28px;margin:0 auto 24px;box-shadow:0 8px 20px rgba(102,126,234,.4)}
+.windows-modal-footer{padding:20px 28px;background:#f8f9fa;display:flex;gap:12px;justify-content:flex-end;border-top:2px solid #e9ecef}
+.windows-modal-footer .btn{padding:12px 24px;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-radius:10px;transition:all .3s ease}
+.windows-modal-footer .btn-primary{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);color:white;box-shadow:0 4px 12px rgba(37,99,235,.3);border:none}
+.windows-modal-footer .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.4);filter:brightness(1.05)}
+.windows-modal-footer .btn-secondary{background:linear-gradient(135deg,#e5e7eb 0%,#f3f4f6 100%);color:#374151;box-shadow:0 2px 8px rgba(0,0,0,.08);border:2px solid #d1d5db}
+.windows-modal-footer .btn-secondary:hover:not(:disabled){background:linear-gradient(135deg,#d1d5db 0%,#e5e7eb 100%);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.windows-modal-footer .btn-danger{background:linear-gradient(135deg,#dc2626 0%,#ef4444 100%);color:white;box-shadow:0 4px 12px rgba(220,38,38,.3);border:none}
+.windows-modal-footer .btn-danger:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(220,38,38,.4);filter:brightness(1.05)}
+.windows-modal-footer .btn-success{background:linear-gradient(135deg,#16a34a 0%,#22c55e 100%);color:white;box-shadow:0 4px 12px rgba(22,163,74,.3);border:none}
+.windows-modal-footer .btn-success:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(22,163,74,.4);filter:brightness(1.05)}
+.windows-modal-footer .btn-warning{background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%);color:white;box-shadow:0 4px 12px rgba(217,119,6,.3);border:none}
+.windows-modal-footer .btn-warning:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(217,119,6,.4);filter:brightness(1.05)}
+
+/* ========== HEADER MEJORADO ========== */
+header.bg-white.shadow-lg.sticky.top-0.z-50{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)!important;box-shadow:0 10px 30px rgba(102,126,234,.3)!important;border-bottom:3px solid rgba(255,255,255,.3)!important}
+header .text-purple-600{color:white!important;text-shadow:0 2px 8px rgba(0,0,0,.2)!important}
+header .text-sm.text-gray-600{color:rgba(255,255,255,.8)!important}
+header .btn-outline{background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.1) 100%)!important;border:2px solid rgba(255,255,255,.4)!important;color:white!important;box-shadow:0 4px 12px rgba(255,255,255,.2)!important}
+header .btn-outline:hover{background:linear-gradient(135deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.2) 100%)!important;transform:translateY(-2px)!important;box-shadow:0 8px 20px rgba(255,255,255,.3)!important}
+header .w-10.h-10.rounded-full.bg-purple-600{background:linear-gradient(135deg,rgba(255,255,255,.9) 0%,rgba(255,255,255,.7) 100%)!important;color:#667eea!important;box-shadow:0 4px 12px rgba(255,255,255,.4)!important}
+header .w-10.h-10.rounded-full.bg-purple-600:hover{transform:scale(1.1)!important;box-shadow:0 6px 20px rgba(255,255,255,.5)!important}
+
+/* ========== BOTONES MEJORADOS ========== */
+.btn-new-vacancy{background:linear-gradient(135deg,#10b981 0%,#059669 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(16,185,129,.4)!important;border:none!important}
+.btn-new-vacancy:hover:not(:disabled){transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(16,185,129,.5)!important;filter:brightness(1.05)!important}
+
+/* Botón de Iniciar Sesión - Azul con degradado blanco */
+.btn-outline{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(59,130,246,.4)!important;border:none!important;font-weight:700!important}
+.btn-outline:hover:not(:disabled){background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(59,130,246,.5)!important;filter:brightness(1.05)!important}
+
+/* Botón Editar - Verde con degradado blanco */
+.btn-outline[data-edit-vacancy]{background:linear-gradient(135deg,#10b981 0%,#059669 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(16,185,129,.4)!important;border:none!important}
+.btn-outline[data-edit-vacancy]:hover{background:linear-gradient(135deg,#059669 0%,#047857 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(16,185,129,.5)!important;filter:brightness(1.05)!important}
+
+/* Botón Eliminar - Rojo con degradado blanco */
+.btn-cancel{background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(239,68,68,.4)!important;border:none!important}
+.btn-cancel:hover:not(:disabled){background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(239,68,68,.5)!important;filter:brightness(1.05)!important}
+
+/* Botón Guardar/Actualizar - Verde brillante */
+.btn-save{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(34,197,94,.4)!important;border:none!important}
+.btn-save:hover:not(:disabled){background:linear-gradient(135deg,#16a34a 0%,#15803d 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(34,197,94,.5)!important;filter:brightness(1.05)!important}
+
+/* Botón Limpiar - Gris elegante */
+.btn-clean{background:linear-gradient(135deg,#9ca3af 0%,#6b7280 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(156,163,175,.3)!important;border:none!important}
+.btn-clean:hover:not(:disabled){background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(156,163,175,.4)!important;filter:brightness(1.05)!important}
+
+/* Botón Cancelar - Gris oscuro */
+.btn-cancel{background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(107,114,128,.3)!important;border:none!important}
+.btn-cancel:hover:not(:disabled){background:linear-gradient(135deg,#4b5563 0%,#374151 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(107,114,128,.4)!important;filter:brightness(1.05)!important}
+
+/* Botón Autofill IA - Dorado elegante */
+.btn-autofill{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%)!important;color:white!important;box-shadow:0 4px 16px rgba(245,158,11,.4)!important;border:none!important}
+.btn-autofill:hover:not(:disabled){background:linear-gradient(135deg,#d97706 0%,#b45309 100%)!important;transform:translateY(-3px)!important;box-shadow:0 8px 28px rgba(245,158,11,.5)!important;filter:brightness(1.05)!important}
+
+/* ========== SECCIONES MEJORADAS ========== */
+section.mb-12 h2,
+section h2.text-2xl.font-black.text-gray-800{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;padding:16px 24px!important;border-radius:12px!important;margin-bottom:24px!important;box-shadow:0 4px 12px rgba(102,126,234,.2)!important;border:2px solid rgba(255,255,255,.3)!important;text-shadow:0 2px 8px rgba(102,126,234,.3)!important}
+section.mb-12 h2 i,
+section h2 i{color:white!important;background:rgba(255,255,255,.2)!important;padding:8px 12px!important;border-radius:8px!important;box-shadow:0 4px 12px rgba(0,0,0,.2)!important}
+
+/* ========== INPUTS MEJORADOS ========== */
+.input-group input,
+.input-group textarea,
+.input-group select{border:2px solid #e5e7eb!important;background:linear-gradient(to bottom,#ffffff 0%,#f9fafb 100%)!important;box-shadow:0 2px 8px rgba(0,0,0,.06)!important;transition:all .3s ease!important}
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus{border-color:#667eea!important;box-shadow:0 0 0 4px rgba(102,126,234,.15),0 4px 12px rgba(102,126,234,.2)!important;background:linear-gradient(to bottom,#ffffff 0%,#f3f4f6 100%)!important;transform:translateY(-1px)!important}
+.input-group label{color:#4b5563!important;background:linear-gradient(135deg,#f3f4f6 0%,#e5e7eb 100%)!important;padding:4px 12px!important;border-radius:6px!important;display:inline-block!important;margin-bottom:12px!important;font-weight:700!important;text-transform:uppercase!important;letter-spacing:1px!important;font-size:12px!important;box-shadow:0 2px 6px rgba(0,0,0,.08)!important}
+
+/* ========== LOGIN/SIGNUP MEJORADOS ========== */
+.bg-gradient-to-br.from-purple-600.to-purple-800{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)!important;box-shadow:0 10px 30px rgba(102,126,234,.4)!important;border-bottom:3px solid rgba(255,255,255,.3)!important}
+.text-purple-200{color:rgba(255,255,255,.85)!important;text-shadow:0 2px 6px rgba(0,0,0,.2)!important}
+
+/* ========== VACANCY CARD MEJORADO ========== */
+.vacancy-card{background:linear-gradient(145deg,#ffffff 0%,#f9fafb 100%)!important;border:2px solid rgba(102,126,234,.1)!important;box-shadow:0 10px 30px rgba(0,0,0,.08)!important;transition:all .4s cubic-bezier(.4,0,.2,1)!important}
+.vacancy-card:hover{transform:translateY(-12px)!important;box-shadow:0 20px 60px rgba(102,126,234,.25),0 0 0 2px rgba(102,126,234,.3)!important;border-color:rgba(102,126,234,.4)!important;background:linear-gradient(145deg,#ffffff 0%,#f3f4f6 100%)!important}
+
+/* ========== IMAGE UPLOAD MEJORADO ========== */
+.image-upload-area{background:linear-gradient(135deg,#f9fafb 0%,#f3f4f6 100%)!important;border:3px dashed rgba(102,126,234,.3)!important;box-shadow:0 4px 12px rgba(0,0,0,.06)!important}
+.image-upload-area:hover{border-color:rgba(102,126,234,.6)!important;background:linear-gradient(135deg,#f3f4f6 0%,#e5e7eb 100%)!important;transform:scale(1.02)!important;box-shadow:0 8px 20px rgba(102,126,234,.15)!important}
+
+/* ========== FORM BUTTONS CONTAINER ========== */
+.form-buttons-container{gap:16px!important;padding-top:24px!important;border-top:2px solid rgba(102,126,234,.1)!important;background:linear-gradient(to bottom,#f9fafb 0%,#ffffff 100%)!important;margin-top:16px!important;padding-bottom:16px!important;border-radius:12px!important;box-shadow:0 -4px 12px rgba(0,0,0,.04)!important}
+
+/* ========== SCROLLBAR MEJORADO ========== */
+::-webkit-scrollbar{width:14px!important}
+::-webkit-scrollbar-track{background:linear-gradient(135deg,#f9fafb 0%,#e5e7eb 100%)!important;border-radius:10px!important;border:2px solid #f3f4f6!important}
+::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)!important;border-radius:10px!important;border:3px solid #f9fafb!important;box-shadow:0 2px 8px rgba(102,126,234,.3)!important}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(135deg,#764ba2 0%,#667eea 100%)!important;box-shadow:0 4px 12px rgba(102,126,234,.4)!important}
+
+/* ========== USER MENU DROPDOWN MEJORADO ========== */
+.user-menu-dropdown{background:linear-gradient(145deg,#ffffff 0%,#f9fafb 100%)!important;box-shadow:0 20px 60px rgba(0,0,0,.2),0 0 0 1px rgba(102,126,234,.2)!important;border-radius:16px!important;border:2px solid rgba(255,255,255,.5)!important;backdrop-filter:blur(10px)!important}
+.user-menu-dropdown .px-4.py-2.border-b{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)!important;color:white!important;border-bottom:3px solid rgba(255,255,255,.3)!important}
+.user-menu-dropdown .px-4.py-2.border-b .text-xs.text-gray-500{color:rgba(255,255,255,.7)!important}
+.user-menu-dropdown .px-4.py-2.border-b .text-sm.font-semibold{color:white!important;text-shadow:0 2px 6px rgba(0,0,0,.2)!important}
+.user-menu-dropdown button{transition:all .3s ease!important}
+.user-menu-dropdown button:hover{background:linear-gradient(135deg,rgba(102,126,234,.1) 0%,rgba(118,75,162,.1) 100%)!important;transform:translateX(4px)!important}
+.user-menu-dropdown button.text-red-600:hover{background:linear-gradient(135deg,rgba(239,68,68,.1) 0%,rgba(220,38,38,.1) 100%)!important;color:#dc2626!important}
+
+/* ========== LOADING SPINNER MEJORADO ========== */
+.loader{border:4px solid rgba(102,126,234,.2)!important;border-top:4px solid #667eea!important;box-shadow:0 0 20px rgba(102,126,234,.4)!important}
+
+/* ========== AI CHAT MODAL MEJORADO ========== */
+.ai-chat-modal{border:3px solid rgba(0,0,0,.3)!important;box-shadow:0 20px 80px rgba(0,0,0,.5),0 0 0 2px rgba(255,215,0,.3)!important;background:linear-gradient(145deg,#ffffff 0%,#f9fafb 100%)!important}
+.ai-chat-header{background:linear-gradient(135deg,#1f2937 0%,#0f172a 100%)!important;border-bottom:3px solid rgba(255,215,0,.5)!important;box-shadow:0 4px 12px rgba(0,0,0,.3)!important}
+.ai-chat-messages{background:linear-gradient(145deg,#0f172a 0%,#1f2937 100%)!important;border-left:3px solid #FFD700!important;border-right:3px solid #FFD700!important;box-shadow:inset 0 0 20px rgba(0,0,0,.5)!important}
+.ai-message.bot{border-left:4px solid #FFD700!important;background:linear-gradient(135deg,#1f2937 0%,#334155 100%)!important;box-shadow:0 4px 12px rgba(255,215,0,.15)!important}
+.ai-message.user{background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%)!important;box-shadow:0 4px 12px rgba(37,99,235,.3)!important}
+.ai-chat-input{background:linear-gradient(135deg,#1f2937 0%,#0f172a 100%)!important;border-top:3px solid rgba(255,215,0,.5)!important;box-shadow:0 -4px 12px rgba(0,0,0,.3)!important}
+.ai-chat-actions .btn-send{background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%)!important;box-shadow:0 4px 12px rgba(37,99,235,.3)!important}
+.ai-chat-actions .btn-start{background:linear-gradient(135deg,#16a34a 0%,#15803d 100%)!important;box-shadow:0 4px 12px rgba(22,163,74,.3)!important}
+.ai-chat-actions .btn-close-chat{background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%)!important;box-shadow:0 4px 12px rgba(220,38,38,.3)!important}
 </style>
 </head>
 <body>
@@ -156,7 +277,7 @@ let isDragging = false;
 let offsetX = 0, offsetY = 0;
 // Flag para evitar múltiples event listeners
 let eventListenersAttached = false;
-// ==================== UTILIDADES ====================
+// ==================== UTILIDADES MEJORADAS ====================
 const showLoading = () => {
 const existingLoader = document.getElementById('loader-overlay');
 if (existingLoader) return;
@@ -172,26 +293,42 @@ state.loading = false;
 const loader = document.getElementById('loader-overlay');
 if (loader) loader.remove();
 };
+// ✅ VENTANA WINDOWS MODAL MEJORADA
 const showModal = (type, title, message) => {
-const existingModals = document.querySelectorAll('#modal-root .modal-overlay');
+const existingModals = document.querySelectorAll('#modal-root .windows-modal-overlay');
 existingModals.forEach(m => m.remove());
-const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+const icons = { 
+success: '✓', 
+error: '✕', 
+warning: '⚠', 
+info: 'ℹ',
+confirm: '?'
+};
 const colors = {
-success: 'linear-gradient(135deg,#28a745 0%,#20c997 100%)',
-error: 'linear-gradient(135deg,#dc3545 0%,#e83e8c 100%)',
-warning: 'linear-gradient(135deg,#ffc107 0%,#fd7e14 100%)',
-info: 'linear-gradient(135deg,#17a2b8 0%,#20c997 100%)'
+success: 'linear-gradient(135deg,#16a34a 0%,#22c55e 100%)',
+error: 'linear-gradient(135deg,#dc2626 0%,#ef4444 100%)',
+warning: 'linear-gradient(135deg,#d97706 0%,#f59e0b 100%)',
+info: 'linear-gradient(135deg,#1e40af 0%,#3b82f6 100%)',
+confirm: 'linear-gradient(135deg,#4b5563 0%,#6b7280 100%)'
 };
 const modal = document.createElement('div');
-modal.className = 'modal-overlay';
+modal.className = 'windows-modal-overlay';
 modal.innerHTML = `
-<div class="modal-window">
-<div class="modal-header" style="background:${colors[type]}">
-<span style="font-size:28px">${icons[type]}</span>
+<div class="windows-modal">
+<div class="windows-modal-header" style="background:${colors[type]}">
+<div class="modal-title">
+<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : type === 'confirm' ? 'fa-question-circle' : 'fa-info-circle'}"></i>
 <span>${escapeHtml(title)}</span>
 </div>
-<div class="modal-body"><p>${escapeHtml(message)}</p></div>
-<div class="modal-footer">
+<button class="close-modal" data-close-modal>&times;</button>
+</div>
+<div class="windows-modal-body">
+<div class="info-icon">
+<i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-times' : type === 'warning' ? 'fa-exclamation' : type === 'confirm' ? 'fa-question' : 'fa-info'}"></i>
+</div>
+<p>${escapeHtml(message)}</p>
+</div>
+<div class="windows-modal-footer">
 <button class="btn btn-primary" data-close-modal>
 <i class="fas fa-check"></i> Aceptar
 </button>
@@ -200,13 +337,14 @@ modal.innerHTML = `
 `;
 const modalRoot = document.getElementById('modal-root');
 modalRoot.appendChild(modal);
-const closeBtn = modal.querySelector('[data-close-modal]');
-const closeModal = () => modal.remove();
-closeBtn.addEventListener('click', closeModal);
-modal.addEventListener('click', (e) => {
-if (e.target === modal) closeModal();
+const closeBtns = modal.querySelectorAll('[data-close-modal]');
+closeBtns.forEach(btn => {
+btn.addEventListener('click', () => modal.remove());
 });
-setTimeout(closeModal, 8000);
+modal.addEventListener('click', (e) => {
+if (e.target === modal) modal.remove();
+});
+setTimeout(() => modal.remove(), 8000);
 };
 const escapeHtml = (text) => {
 if (typeof text !== 'string') return '';
@@ -266,7 +404,7 @@ state.acceptedTerms = !!accepted;
 state.view = accepted ? 'dashboard' : 'terms';
 await loadVacancies();
 render();
-showModal('success', 'Bienvenido', 'Has iniciado sesión correctamente');
+showModal('success', '¡Bienvenido!', 'Has iniciado sesión correctamente');
 } catch (error) {
 console.error('❌ [LOGIN] Error:', error);
 showModal('error', 'Error de inicio de sesión', error.message || 'Correo o contraseña incorrectos');
@@ -292,7 +430,7 @@ password: state.formData.password,
 options: { emailRedirectTo: SUPABASE_REDIRECT_URL }
 });
 if (error) throw error;
-showModal('success', 'Registro exitoso', 'Revisa tu correo para confirmar tu cuenta.');
+showModal('success', '¡Registro exitoso!', 'Revisa tu correo para confirmar tu cuenta.');
 state.view = 'login';
 resetAuthForm();
 render();
@@ -310,7 +448,7 @@ showLoading();
 try {
 const { error } = await supabaseClient.auth.resetPasswordForEmail(email.trim(), { redirectTo: SUPABASE_REDIRECT_URL });
 if (error) throw error;
-showModal('success', 'Correo enviado', 'Revisa tu bandeja de entrada para restablecer tu contraseña');
+showModal('success', '¡Correo enviado!', 'Revisa tu bandeja de entrada para restablecer tu contraseña');
 } catch (error) {
 console.error('❌ [RESET] Error:', error);
 showModal('error', 'Error', 'No se pudo enviar el correo');
@@ -322,11 +460,7 @@ async function handleLogout() {
 if (!confirm('¿Cerrar sesión?')) return;
 showLoading();
 try {
-// ✅ CORREGIDO: Verificar sesión antes de logout para evitar 403
-const { data: { session } } = await supabaseClient.auth.getSession();
-if (session) {
-await supabaseClient.auth.signOut({ scope: 'local' });
-}
+await supabaseClient.auth.signOut();
 state.user = null;
 state.isGuest = false;
 state.view = 'login';
@@ -335,24 +469,15 @@ resetAuthForm();
 resetJobForm();
 clearAIData();
 render();
+showModal('info', '¡Hasta pronto!', 'Has cerrado sesión correctamente');
 } catch (error) {
 console.error('❌ [LOGOUT] Error:', error);
-// ✅ SIEMPRE ocultar loader incluso si hay error
-state.user = null;
-state.isGuest = false;
-state.view = 'login';
-state.acceptedTerms = false;
-resetAuthForm();
-resetJobForm();
-clearAIData();
-render();
 } finally {
 hideLoading();
 }
 }
 async function handleDeleteAccount() {
-if (!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?
-Esta acción NO se puede deshacer.')) return;
+if (!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?\nEsta acción NO se puede deshacer.')) return;
 const conf = prompt('Escribe "ELIMINAR" para confirmar:');
 if (conf !== 'ELIMINAR') return;
 showLoading();
@@ -367,7 +492,7 @@ await supabaseClient.from('vacancies').delete().eq('id', v.id);
 }
 }
 localStorage.removeItem('terms_accepted_' + state.user.id);
-showModal('success', 'Eliminado', 'Tus vacantes han sido eliminadas.');
+showModal('success', '¡Eliminado!', 'Tus vacantes han sido eliminadas.');
 setTimeout(() => handleLogout(), 2000);
 } catch (error) {
 console.error('❌ [DELETE] Error:', error);
@@ -381,6 +506,7 @@ state.isGuest = true;
 state.view = 'dashboard';
 loadVacancies();
 render();
+showModal('info', '¡Modo Invitado!', 'Puedes ver las vacantes pero no publicar.');
 }
 function handleAcceptTerms() {
 if (!state.acceptedTerms) {
@@ -534,7 +660,7 @@ const { error } = await supabaseClient
 if (error) throw error;
 await loadVacancies();
 render();
-showModal('success', 'Eliminado', 'Vacante eliminada correctamente');
+showModal('success', '¡Eliminado!', 'Vacante eliminada correctamente');
 } catch (error) {
 console.error('❌ [DELETE] Error:', error);
 showModal('error', 'Error', 'No se pudo eliminar la vacante');
@@ -975,14 +1101,14 @@ const otherVacancies = state.user
 : state.vacancies;
 return `
 <div class="min-h-screen">
-<header class="header-custom sticky top-0 z-50 shadow-lg">
+<header class="bg-white shadow-lg sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 <div class="flex justify-between items-center">
 <div class="flex items-center gap-3">
 <div class="text-4xl">💼</div>
 <div>
-<h1 class="text-2xl font-black text-white">Empleos León GTO</h1>
-<p class="text-sm text-purple-100">${state.vacancies.length} vacantes disponibles</p>
+<h1 class="text-2xl font-black text-purple-600">Empleos León GTO</h1>
+<p class="text-sm text-gray-600">${state.vacancies.length} vacantes disponibles</p>
 </div>
 </div>
 <div class="flex items-center gap-4">
@@ -991,11 +1117,11 @@ ${state.user && !state.isGuest ? `
 <i class="fas fa-plus"></i> Nueva Vacante
 </button>
 <div class="relative">
-<button id="user-menu-btn" class="w-10 h-10 rounded-full bg-white text-purple-600 flex items-center justify-center hover:bg-purple-100 transition shadow-md">
+<button id="user-menu-btn" class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 transition">
 <i class="fas fa-user"></i>
 </button>
 ${state.menuOpen ? `
-<div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 border border-gray-200">
+<div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 border border-gray-200 user-menu-dropdown">
 <div class="px-4 py-2 border-b border-gray-200">
 <p class="text-xs text-gray-500">Sesión iniciada</p>
 <p class="text-sm font-semibold truncate">${escapeHtml(state.user.email)}</p>
@@ -1023,8 +1149,8 @@ ${state.menuOpen ? `
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 ${state.user && userVacancies.length > 0 ? `
 <section class="mb-12">
-<h2 class="text-2xl font-black section-title mb-6 flex items-center gap-2">
-<i class="fas fa-briefcase"></i> Mis Vacantes
+<h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-2">
+<i class="fas fa-briefcase text-purple-600"></i> Mis Vacantes
 </h2>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 ${userVacancies.map(v => renderVacancyCard(v, true)).join('')}
@@ -1032,8 +1158,8 @@ ${userVacancies.map(v => renderVacancyCard(v, true)).join('')}
 </section>
 ` : ''}
 <section>
-<h2 class="text-2xl font-black section-title mb-6 flex items-center gap-2">
-<i class="fas fa-search"></i> ${state.user ? 'Otras Vacantes' : 'Todas las Vacantes'}
+<h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-2">
+<i class="fas fa-search text-purple-600"></i> ${state.user ? 'Otras Vacantes' : 'Todas las Vacantes'}
 </h2>
 ${otherVacancies.length === 0 ? `
 <div class="text-center py-16">
@@ -1100,7 +1226,7 @@ ${vacancy.schedule ? `
 </div>
 ${isOwner ? `
 <div class="flex gap-2 pt-4 border-t border-gray-200">
-<button data-edit-vacancy="${vacancy.id}" class="flex-1 btn btn-edit">
+<button data-edit-vacancy="${vacancy.id}" class="flex-1 btn btn-outline">
 <i class="fas fa-edit"></i> Editar
 </button>
 <button data-delete-vacancy="${vacancy.id}" class="flex-1 btn btn-cancel">
