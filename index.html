@@ -127,7 +127,7 @@ let state = {
   menuOpen: false,
   acceptedTerms: false,
   loading: false,
-  imageUploading: false, // ✅ Nuevo flag específico para subida de imagen
+  imageUploading: false,
   formData: {
     email: '',
     password: '',
@@ -137,7 +137,7 @@ let state = {
     description: '',
     location: '',
     contact_phone: '',
-    contact_email: '',
+    publication_date: '',
     schedule: '',
     work_days: '',
     imageBase64: ''
@@ -155,7 +155,7 @@ let state = {
 let isDragging = false;
 let offsetX = 0, offsetY = 0;
 
-// ✅ Debouncer para evitar múltiples llamadas
+// Debouncer para evitar múltiples llamadas
 let debounceTimers = {};
 function debounce(key, func, delay = 300) {
   clearTimeout(debounceTimers[key]);
@@ -230,7 +230,6 @@ const escapeHtml = (text) => {
   return text.replace(/[&<>"']/g, m => map[m]);
 };
 
-// ✅ Función mejorada para convertir imagen a base64
 const convertImageToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     if (state.imageUploading) {
@@ -253,15 +252,6 @@ const convertImageToBase64 = (file) => {
   });
 };
 
-// ✅ Actualización parcial del DOM (evita re-renders completos)
-const updatePartialDOM = (selector, content) => {
-  const element = document.querySelector(selector);
-  if (element && element.innerHTML !== content) {
-    element.innerHTML = content;
-  }
-};
-
-// ✅ Toggle password sin re-render completo
 const togglePasswordVisibility = (field) => {
   if (field === 'password') {
     state.showPassword = !state.showPassword;
@@ -450,18 +440,16 @@ async function loadVacancies() {
   }
 }
 
-// ✅ Función MEJORADA para manejar subida de imagen (previene múltiples llamadas)
+// ✅ CORREGIDO: Evitar doble carga y bucle infinito
 async function handleImageUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
   
-  // ✅ Prevenir múltiples cargas
   if (state.imageUploading) {
     console.warn('⚠️ [UPLOAD] Carga ya en progreso');
     return;
   }
   
-  // Validaciones
   if (file.size > 2 * 1024 * 1024) {
     showModal('error', 'Archivo muy grande', 'El tamaño máximo es 2MB');
     e.target.value = '';
@@ -481,7 +469,7 @@ async function handleImageUpload(e) {
     state.formData.imageBase64 = base64Image;
     console.log('✅ [UPLOAD] Imagen convertida exitosamente');
     
-    // ✅ Actualización parcial solo del preview
+    // ✅ Actualizar el preview manualmente sin re-render completo
     const previewContainer = document.querySelector('.image-upload-area');
     if (previewContainer) {
       previewContainer.classList.add('has-image');
@@ -492,6 +480,15 @@ async function handleImageUpload(e) {
           </div>
         </label>
       `;
+      
+      // ✅ Re-attach event listener SOLO al input de imagen
+      const newImageInput = document.createElement('input');
+      newImageInput.type = 'file';
+      newImageInput.accept = 'image/*';
+      newImageInput.id = 'image-upload';
+      newImageInput.className = 'hidden';
+      newImageInput.addEventListener('change', handleImageUpload, { once: true });
+      previewContainer.querySelector('label').appendChild(newImageInput);
     }
   } catch (error) {
     console.error('❌ [UPLOAD] Error:', error);
@@ -500,54 +497,34 @@ async function handleImageUpload(e) {
   }
 }
 
-// ✅ Función de guardado optimizada
+// ✅ CORREGIDO: Solo imagen obligatoria
 async function handleSaveVacancy(e) {
   e.preventDefault();
   
   if (state.loading) return;
   
-  // Validaciones
-  if (!state.user || !state.user.id) {
-    return showModal('error', 'Sesión requerida', 'Inicia sesión para publicar una vacante.');
-  }
-  
-  if (!state.formData.company?.trim()) {
-    return showModal('error', 'Empresa requerida', 'El campo "Empresa" es obligatorio.');
-  }
-  
-  if (!state.formData.job_title?.trim()) {
-    return showModal('error', 'Puesto requerido', 'El campo "Puesto" es obligatorio.');
-  }
-  
-  if (!state.formData.description?.trim()) {
-    return showModal('error', 'Descripción requerida', 'El campo "Descripción" es obligatorio.');
-  }
-  
+  // ✅ SOLO VALIDAR IMAGEN
   if (!state.formData.imageBase64) {
     return showModal('error', 'Imagen requerida', 'Debes subir una imagen antes de guardar.');
   }
   
-  // Validación de teléfono
-  if (state.formData.contact_phone) {
-    const phoneDigits = state.formData.contact_phone.replace(/\D/g, '');
-    if (phoneDigits.length !== 10) {
-      return showModal('error', 'Teléfono inválido', 'El número debe tener exactamente 10 dígitos.');
-    }
-    state.formData.contact_phone = phoneDigits;
+  // ✅ Validar que haya usuario autenticado
+  if (!state.user || !state.user.id) {
+    return showModal('error', 'Sesión requerida', 'Inicia sesión para publicar una vacante.');
   }
   
   showLoading();
   try {
     const vacancyData = {
       user_id: state.user.id,
-      company: state.formData.company.trim(),
-      job_title: state.formData.job_title.trim(),
-      description: state.formData.description.trim(),
-      location: state.formData.location.trim() || 'León, Guanajuato',
-      contact_phone: state.formData.contact_phone || null,
-      contact_email: state.formData.contact_email.trim() || null,
-      schedule: state.formData.schedule.trim() || null,
-      work_days: state.formData.work_days.trim() || null,
+      company: state.formData.company?.trim() || 'LA EMPRESA NO PROPORCIONA INFORMACIÓN',
+      job_title: state.formData.job_title?.trim() || 'LA EMPRESA NO PROPORCIONA INFORMACIÓN',
+      description: state.formData.description?.trim() || 'LA EMPRESA NO PROPORCIONA INFORMACIÓN',
+      location: state.formData.location?.trim() || null,
+      contact_phone: state.formData.contact_phone?.trim() || null, // ✅ Ahora acepta texto
+      publication_date: state.formData.publication_date?.trim() || null, // ✅ Nuevo campo
+      schedule: state.formData.schedule?.trim() || null,
+      work_days: state.formData.work_days?.trim() || null,
       image_base64: state.formData.imageBase64
     };
     
@@ -576,9 +553,10 @@ async function handleSaveVacancy(e) {
     
     await loadVacancies();
     
+    // ✅ CORREGIDO: Cambiar vista ANTES de hideLoading y render
     state.view = 'dashboard';
-    hideLoading();
     render();
+    hideLoading();
     
     showModal('success', '¡Éxito!', wasEditing ? 'Vacante actualizada correctamente' : 'Vacante publicada correctamente');
   } catch (error) {
@@ -626,7 +604,7 @@ function handleEditVacancy(vacancyId) {
     description: vacancy.description || '',
     location: vacancy.location || '',
     contact_phone: vacancy.contact_phone || '',
-    contact_email: vacancy.contact_email || '',
+    publication_date: vacancy.publication_date || '', // ✅ Nuevo campo
     schedule: vacancy.schedule || '',
     work_days: vacancy.work_days || '',
     imageBase64: vacancy.image_base64 || '',
@@ -663,7 +641,6 @@ function toggleAIChat() {
   }
 }
 
-// ✅ Función MEJORADA para enviar mensaje a IA
 async function sendAIMessage() {
   const input = document.getElementById('ai-chat-input');
   const message = input?.value.trim();
@@ -673,7 +650,6 @@ async function sendAIMessage() {
     return;
   }
   
-  // ✅ Prevenir múltiples envíos
   if (state.aiLoading) {
     console.warn('⚠️ [IA] Ya hay una solicitud en progreso');
     return;
@@ -701,7 +677,6 @@ async function sendAIMessage() {
     
     console.log('📤 [IA] Enviando request a Edge Function...');
     
-    // ✅ CORRECCIÓN: URL correcta del Edge Function
     const response = await fetch(`${SUPABASE_URL}/functions/v1/extract-vacancy`, {
       method: 'POST',
       headers: {
@@ -773,7 +748,6 @@ function startAutofill() {
   if (data.description) state.formData.description = data.description;
   if (data.location) state.formData.location = data.location;
   if (data.contact_phone) state.formData.contact_phone = data.contact_phone;
-  if (data.contact_email) state.formData.contact_email = data.contact_email;
   if (data.schedule) state.formData.schedule = data.schedule;
   if (data.work_days) state.formData.work_days = data.work_days;
   
@@ -786,12 +760,10 @@ function startAutofill() {
   showModal('success', '¡Formulario rellenado!', 'Revisa los campos y ajusta si es necesario antes de guardar. ✨');
 }
 
-// ✅ Función MEJORADA para subir imagen en IA (previene bucle en Android)
 function handleAIImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  // ✅ Prevenir procesamiento doble
   if (state.aiImage && state.aiImage.name === file.name && state.aiImage.size === file.size) {
     console.warn('⚠️ [IA] Imagen ya procesada');
     return;
@@ -815,7 +787,6 @@ function handleAIImageUpload(event) {
   reader.onload = (e) => {
     state.aiImagePreview = e.target.result;
     
-    // ✅ Actualización parcial del DOM
     const fileUploadSection = document.querySelector('.file-upload');
     if (fileUploadSection && !document.querySelector('.file-preview')) {
       const previewHTML = `
@@ -826,7 +797,6 @@ function handleAIImageUpload(event) {
       `;
       fileUploadSection.insertAdjacentHTML('beforeend', previewHTML);
       
-      // Re-attach event listener
       const removeBtn = document.getElementById('remove-ai-image-btn');
       if (removeBtn) {
         removeBtn.addEventListener('click', removeAIImage);
@@ -943,7 +913,7 @@ function resetJobForm() {
   state.formData.description = '';
   state.formData.location = '';
   state.formData.contact_phone = '';
-  state.formData.contact_email = '';
+  state.formData.publication_date = ''; // ✅ Nuevo campo
   state.formData.schedule = '';
   state.formData.work_days = '';
   state.formData.imageBase64 = '';
@@ -1201,6 +1171,7 @@ function renderDashboard() {
   `;
 }
 
+// ✅ CORREGIDO: Sin WhatsApp, teléfono como texto, nueva fecha
 function renderVacancyCard(vacancy, isOwner) {
   return `
     <div class="vacancy-card">
@@ -1227,14 +1198,14 @@ function renderVacancyCard(vacancy, isOwner) {
           ` : ''}
           ${vacancy.contact_phone ? `
             <div class="flex items-start gap-2 text-sm text-gray-700">
-              <i class="fab fa-whatsapp text-green-600 mt-1"></i>
-              <a href="https://wa.me/52${vacancy.contact_phone}" target="_blank" class="hover:text-green-600 hover:underline">${escapeHtml(vacancy.contact_phone)}</a>
+              <i class="fas fa-phone text-purple-600 mt-1"></i>
+              <span>${escapeHtml(vacancy.contact_phone)}</span>
             </div>
           ` : ''}
-          ${vacancy.contact_email ? `
+          ${vacancy.publication_date ? `
             <div class="flex items-start gap-2 text-sm text-gray-700">
-              <i class="fas fa-envelope text-purple-600 mt-1"></i>
-              <a href="mailto:${escapeHtml(vacancy.contact_email)}" class="hover:text-purple-600 hover:underline truncate">${escapeHtml(vacancy.contact_email)}</a>
+              <i class="fas fa-calendar text-purple-600 mt-1"></i>
+              <span>Publicado: ${escapeHtml(vacancy.publication_date)}</span>
             </div>
           ` : ''}
           ${vacancy.work_days ? `
@@ -1266,6 +1237,7 @@ function renderVacancyCard(vacancy, isOwner) {
   `;
 }
 
+// ✅ CORREGIDO: Nuevo campo "Fecha de publicación" y todos opcionales excepto imagen
 function renderForm() {
   return `
     <div class="min-h-screen py-8">
@@ -1278,7 +1250,7 @@ function renderForm() {
           
           <form id="vacancy-form" class="p-8 space-y-6">
             <div class="input-group">
-              <label>Imagen de la Vacante *</label>
+              <label>Imagen de la Vacante * (Obligatorio)</label>
               <div class="image-upload-area ${state.formData.imageBase64 ? 'has-image' : ''}">
                 <input type="file" accept="image/*" id="image-upload" class="hidden">
                 <label for="image-upload" class="cursor-pointer block">
@@ -1300,10 +1272,9 @@ function renderForm() {
             </div>
             
             <div class="input-group">
-              <label>Empresa *</label>
+              <label>Empresa</label>
               <input 
                 type="text" 
-                required 
                 placeholder="Ej: Calzado León S.A." 
                 value="${escapeHtml(state.formData.company)}" 
                 id="input-company"
@@ -1311,10 +1282,9 @@ function renderForm() {
             </div>
             
             <div class="input-group">
-              <label>Puesto *</label>
+              <label>Puesto</label>
               <input 
                 type="text" 
-                required 
                 placeholder="Ej: Desarrollador Full Stack" 
                 value="${escapeHtml(state.formData.job_title)}" 
                 id="input-job-title"
@@ -1322,10 +1292,9 @@ function renderForm() {
             </div>
             
             <div class="input-group">
-              <label>Descripción del Puesto *</label>
+              <label>Descripción del Puesto</label>
               <textarea 
                 rows="5" 
-                required 
                 placeholder="Describe las responsabilidades, requisitos y beneficios del puesto..." 
                 id="input-description"
               >${escapeHtml(state.formData.description)}</textarea>
@@ -1343,22 +1312,20 @@ function renderForm() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="input-group">
-                <label>WhatsApp (10 dígitos)</label>
+                <label>Teléfono de Contacto</label>
                 <input 
-                  type="tel" 
-                  maxlength="10" 
-                  placeholder="4771234567" 
+                  type="text" 
+                  placeholder="Ej: 477-123-4567 o Llamar al..." 
                   value="${escapeHtml(state.formData.contact_phone)}" 
                   id="input-phone"
                 >
               </div>
               <div class="input-group">
-                <label>Email de Contacto</label>
+                <label>Fecha de Publicación</label>
                 <input 
-                  type="email" 
-                  placeholder="rh@empresa.com" 
-                  value="${escapeHtml(state.formData.contact_email)}" 
-                  id="input-email"
+                  type="date" 
+                  value="${escapeHtml(state.formData.publication_date)}" 
+                  id="input-publication-date"
                 >
               </div>
             </div>
@@ -1668,10 +1635,10 @@ function attachEventListeners() {
   if (vacancyForm) {
     vacancyForm.addEventListener('submit', handleSaveVacancy);
     
+    // ✅ CORREGIDO: Event listener de imagen con once:true para evitar doble carga
     const imageUpload = document.getElementById('image-upload');
     if (imageUpload) {
-      // ✅ Prevenir múltiples eventos en Android
-      imageUpload.addEventListener('change', handleImageUpload, { once: false, passive: true });
+      imageUpload.addEventListener('change', handleImageUpload, { once: true });
     }
     
     const inputCompany = document.getElementById('input-company');
@@ -1702,18 +1669,19 @@ function attachEventListeners() {
       });
     }
     
+    // ✅ CORREGIDO: Teléfono acepta texto
     const inputPhone = document.getElementById('input-phone');
     if (inputPhone) {
       inputPhone.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '');
         state.formData.contact_phone = e.target.value;
       });
     }
     
-    const inputEmail = document.getElementById('input-email');
-    if (inputEmail) {
-      inputEmail.addEventListener('input', (e) => {
-        state.formData.contact_email = e.target.value;
+    // ✅ NUEVO: Campo de fecha de publicación
+    const inputPublicationDate = document.getElementById('input-publication-date');
+    if (inputPublicationDate) {
+      inputPublicationDate.addEventListener('input', (e) => {
+        state.formData.publication_date = e.target.value;
       });
     }
     
@@ -1793,8 +1761,7 @@ function attachEventListeners() {
   
   const aiImageUpload = document.getElementById('ai-image-upload');
   if (aiImageUpload) {
-    // ✅ Prevenir múltiples eventos en Android
-    aiImageUpload.addEventListener('change', handleAIImageUpload, { once: false, passive: true });
+    aiImageUpload.addEventListener('change', handleAIImageUpload, { once: false });
   }
   
   const removeAiImageBtn = document.getElementById('remove-ai-image-btn');
