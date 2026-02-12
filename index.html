@@ -18,6 +18,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(50px) scale(0.9)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes modalPop{from{transform:scale(0.95);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pointingHand{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes guestGlow{0%,100%{text-shadow:0 0 10px rgba(34,197,94,0.6),0 0 20px rgba(34,197,94,0.4)}50%{text-shadow:0 0 20px rgba(34,197,94,0.8),0 0 30px rgba(34,197,94,0.6)}}
 .fade-in{animation:fadeIn .5s ease-out forwards}
 .slide-in{animation:slideIn .3s ease-out forwards}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -41,6 +43,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-clean:hover:not(:disabled){background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%);transform:translateY(-2px)}
 .btn-autofill{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:white;box-shadow:0 4px 14px rgba(245,158,11,.4)}
 .btn-autofill:hover:not(:disabled){background:linear-gradient(135deg,#d97706 0%,#b45309 100%);transform:translateY(-2px)}
+.guest-access-link{display:inline-flex;align-items:center;gap:8px;color:#22c55e;font-weight:700;font-size:15px;text-decoration:none;padding:8px 16px;border-radius:8px;transition:all .3s ease;background:rgba(34,197,94,0.1);border:2px solid transparent;animation:guestGlow 2s ease-in-out infinite}
+.guest-access-link:hover{background:rgba(34,197,94,0.2);border-color:#22c55e;transform:scale(1.05)}
+.guest-access-link .hand-icon{animation:pointingHand 1s ease-in-out infinite;font-size:18px}
 .input-group{position:relative;margin-bottom:20px}
 .input-group input,.input-group textarea,.input-group select{width:100%;padding:14px 16px;border:2px solid #e9ecef;border-radius:10px;font-size:14px;transition:all .2s;font-family:inherit;background:linear-gradient(to bottom,#ffffff 0%,#f9fafb 100%)}
 .input-group input:focus,.input-group textarea:focus,.input-group select:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 4px rgba(102,126,234,.1)}
@@ -99,6 +104,7 @@ textarea{box-shadow:0 2px 6px rgba(0,0,0,0.1)}
 header.top-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);box-shadow:0 10px 30px rgba(102,126,234,.3)}
 header.top-header h1{color:white;text-shadow:0 2px 8px rgba(0,0,0,.2)}
 header.top-header p{color:rgba(255,255,255,.85)}
+.guest-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(34,197,94,.3)}
 </style>
 </head>
 <body>
@@ -239,7 +245,6 @@ async function handleLogin(e) {
     if (error) throw error;
     if (!data || !data.user) throw new Error('No se recibió información del usuario');
     
-    // NO hacer render aquí - el onAuthStateChange se encargará
     console.log('✅ Login exitoso');
   } catch (error) {
     console.error('❌ Error login:', error);
@@ -289,17 +294,10 @@ async function handleLogout() {
   showLoading();
   
   try {
-    // Primero resetear el estado local ANTES de hacer signOut
     resetCompleteState();
-    
-    // Ahora hacer signOut - esto disparará el onAuthStateChange pero el estado ya está limpio
     await supabaseClient.auth.signOut();
-    
     console.log('✅ Sesión cerrada');
-    
-    // Forzar un render final
     render();
-    
   } catch (error) {
     console.error('❌ Error logout:', error);
     showModal('error', 'Error', 'Hubo un problema al cerrar sesión');
@@ -340,11 +338,29 @@ async function handleDeleteAccount() {
   }
 }
 
-function handleGuestAccess() {
-  state.isGuest = true;
-  state.view = 'dashboard';
-  loadVacancies();
-  render();
+async function handleGuestAccess() {
+  console.log('👤 Acceso como invitado...');
+  showLoading();
+  
+  try {
+    state.isGuest = true;
+    state.view = 'dashboard';
+    
+    // Cargar vacantes públicas (sin autenticación)
+    await loadVacancies();
+    
+    console.log('✅ Acceso invitado exitoso. Vacantes cargadas:', state.vacancies.length);
+    render();
+    showModal('info', '¡Bienvenido!', 'Estás navegando como invitado. Podrás ver todas las vacantes pero no publicar.');
+  } catch (error) {
+    console.error('❌ Error acceso invitado:', error);
+    showModal('error', 'Error', 'No se pudo cargar las vacantes');
+    state.isGuest = false;
+    state.view = 'login';
+    render();
+  } finally {
+    hideLoading();
+  }
 }
 
 function handleAcceptTerms() {
@@ -361,17 +377,21 @@ function handleAcceptTerms() {
 
 // ==================== VACANTES ====================
 async function loadVacancies() {
+  console.log('📥 Cargando vacantes...');
   try {
     const { data, error } = await supabaseClient
       .from('vacancies')
       .select('*')
       .order('created_at', { ascending: false });
+    
     if (error) throw error;
+    
     state.vacancies = data || [];
     console.log('✅ Vacantes cargadas:', state.vacancies.length);
   } catch (error) {
     console.error('❌ Error loading vacancies:', error);
     state.vacancies = [];
+    // No mostramos modal de error aquí para no molestar al usuario
   }
 }
 
@@ -685,7 +705,6 @@ function resetJobForm() {
 
 // ==================== RENDER ====================
 function render() {
-  // Evitar renders concurrentes
   if (state.isRendering) {
     console.log('⏸️ Render ya en progreso, saltando...');
     return;
@@ -751,11 +770,16 @@ function renderLogin() {
           <button type="submit" class="btn btn-primary w-full" ${state.loading ? 'disabled' : ''}>
             ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Iniciando...' : '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión'}
           </button>
-          <div class="text-center space-y-2">
+          <div class="text-center space-y-3">
             <div class="text-sm text-gray-600">
               ¿No tienes cuenta? <button type="button" id="go-signup" class="text-purple-600 hover:underline font-semibold">Regístrate</button>
             </div>
-            <button type="button" id="guest-btn" class="text-gray-500 hover:text-purple-600 text-sm underline">Continuar como invitado</button>
+            <div class="flex items-center justify-center">
+              <button type="button" id="guest-btn" class="guest-access-link">
+                <span class="hand-icon">👉</span>
+                <span>Continuar como invitado</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -846,11 +870,19 @@ function renderDashboard() {
               <div class="text-4xl">💼</div>
               <div>
                 <h1 class="text-2xl font-black">Empleos León GTO</h1>
-                <p class="text-sm">${state.vacancies.length} vacantes</p>
+                <p class="text-sm">${state.vacancies.length} vacantes disponibles</p>
               </div>
             </div>
             <div class="flex items-center gap-4">
-              ${state.user && !state.isGuest ? `
+              ${state.isGuest ? `
+                <span class="guest-badge">
+                  <i class="fas fa-eye"></i>
+                  Modo Invitado
+                </span>
+                <button id="go-login" class="btn btn-outline">
+                  <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+              ` : state.user ? `
                 <button id="new-vacancy" class="btn btn-new-vacancy">
                   <i class="fas fa-plus"></i> Nueva Vacante
                 </button>
@@ -899,10 +931,21 @@ function renderDashboard() {
           <h2 class="text-2xl font-black mb-6">
             <i class="fas fa-search text-purple-600"></i> ${state.user ? 'Otras Vacantes' : 'Todas las Vacantes'}
           </h2>
-          ${otherVacancies.length === 0 ? `
+          ${state.vacancies.length === 0 ? `
             <div class="text-center py-16">
               <div class="text-6xl mb-4">📭</div>
               <p class="text-xl text-gray-600">No hay vacantes disponibles</p>
+              ${state.isGuest ? `
+                <p class="text-gray-500 mt-2">Regístrate para publicar la primera vacante</p>
+                <button id="go-signup-from-empty" class="btn btn-primary mt-4">
+                  <i class="fas fa-user-plus"></i> Crear Cuenta
+                </button>
+              ` : ''}
+            </div>
+          ` : otherVacancies.length === 0 && !state.isGuest ? `
+            <div class="text-center py-16">
+              <div class="text-6xl mb-4">🎉</div>
+              <p class="text-xl text-gray-600">¡Eres el primero! Solo tú has publicado vacantes</p>
             </div>
           ` : `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1166,6 +1209,10 @@ function attachEvents() {
     state.view = 'login';
     render();
   });
+  document.getElementById('go-signup-from-empty')?.addEventListener('click', () => {
+    state.view = 'signup';
+    render();
+  });
   
   // Vacancy cards
   document.querySelectorAll('[data-edit]').forEach(btn => {
@@ -1236,7 +1283,6 @@ async function init() {
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('🔐 Auth:', event);
       
-      // Evitar procesar si ya estamos procesando un logout
       if (event === 'SIGNED_OUT' && !state.user) {
         console.log('⏭️ SIGNED_OUT ignorado - ya procesado');
         return;
@@ -1244,6 +1290,7 @@ async function init() {
       
       if (event === 'SIGNED_IN' && session?.user) {
         state.user = session.user;
+        state.isGuest = false;
         const accepted = localStorage.getItem('terms_accepted_' + session.user.id);
         state.acceptedTerms = !!accepted;
         state.view = accepted ? 'dashboard' : 'terms';
@@ -1252,7 +1299,6 @@ async function init() {
         render();
         showModal('success', '¡Bienvenido!', 'Has iniciado sesión correctamente');
       } else if (event === 'SIGNED_OUT') {
-        // Solo resetear si no lo hemos hecho ya
         if (state.user) {
           console.log('🔄 SIGNED_OUT detectado - reseteando estado');
           resetCompleteState();
