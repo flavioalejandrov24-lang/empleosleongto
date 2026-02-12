@@ -970,21 +970,23 @@ function renderLogin() {
 <div class="input-group">
 <label>Correo Electrónico</label>
 <input
-type="email"
-required
-placeholder="tu@email.com"
-value="${escapeHtml(state.formData.email)}"
-id="login-email"
+  type="email"
+  required
+  placeholder="tu@email.com"
+  value="${escapeHtml(state.formData.email)}"
+  id="login-email"
+  oninput="state.formData.email = this.value"
 >
 </div>
 <div class="input-group">
 <label>Contraseña</label>
 <input
-type="${state.showPassword ? 'text' : 'password'}"
-required
-placeholder="••••••••"
-value="${escapeHtml(state.formData.password)}"
-id="login-password"
+  type="${state.showPassword ? 'text' : 'password'}"
+  required
+  placeholder="••••••••"
+  value="${escapeHtml(state.formData.password)}"
+  id="login-password"
+  oninput="state.formData.password = this.value"
 >
 <span class="input-icon" id="toggle-password">
 <i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
@@ -1031,6 +1033,7 @@ required
 placeholder="tu@email.com"
 value="${escapeHtml(state.formData.email)}"
 id="signup-email"
+oninput="state.formData.email = this.value"
 >
 </div>
 <div class="input-group">
@@ -1041,6 +1044,7 @@ required
 placeholder="Mínimo 6 caracteres"
 value="${escapeHtml(state.formData.password)}"
 id="signup-password"
+oninput="state.formData.password = this.value"
 >
 <span class="input-icon" id="toggle-password">
 <i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
@@ -1054,6 +1058,7 @@ required
 placeholder="Repite tu contraseña"
 value="${escapeHtml(state.formData.confirmPassword)}"
 id="signup-confirm-password"
+oninput="state.formData.confirmPassword = this.value"
 >
 <span class="input-icon" id="toggle-confirm-password">
 <i class="fas ${state.showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
@@ -1073,7 +1078,7 @@ Inicia Sesión
 </div>
 `;
 }
-
+  
 function renderTerms() {
   return `
 <div class="min-h-screen flex items-center justify-center p-4">
@@ -1308,6 +1313,7 @@ type="text"
 placeholder="Ej: Calzado León S.A."
 value="${escapeHtml(state.formData.company)}"
 id="input-company"
+oninput="state.formData.company = this.value"
 >
 </div>
 <div class="input-group">
@@ -1317,6 +1323,7 @@ type="text"
 placeholder="Ej: Desarrollador Full Stack"
 value="${escapeHtml(state.formData.job_title)}"
 id="input-job-title"
+oninput="state.formData.job_title = this.value"
 >
 </div>
 <div class="input-group">
@@ -1325,6 +1332,7 @@ id="input-job-title"
 rows="5"
 placeholder="Describe las responsabilidades, requisitos y beneficios del puesto..."
 id="input-description"
+oninput="state.formData.description = this.value"
 >${escapeHtml(state.formData.description)}</textarea>
 </div>
 <div class="input-group">
@@ -1334,6 +1342,7 @@ type="text"
 placeholder="León, Guanajuato"
 value="${escapeHtml(state.formData.location)}"
 id="input-location"
+oninput="state.formData.location = this.value"
 >
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1344,6 +1353,7 @@ type="text"
 placeholder="Ej: 477-123-4567 o Llamar al..."
 value="${escapeHtml(state.formData.contact_phone)}"
 id="input-phone"
+oninput="state.formData.contact_phone = this.value"
 >
 </div>
 <div class="input-group">
@@ -1352,6 +1362,7 @@ id="input-phone"
 rows="2"
 placeholder="Ej: 15 de enero de 2025"
 id="input-publication-date"
+oninput="state.formData.publication_date = this.value"
 >${escapeHtml(state.formData.publication_date)}</textarea>
 </div>
 </div>
@@ -1361,6 +1372,7 @@ id="input-publication-date"
 rows="2"
 placeholder="Ej: Lunes a Viernes"
 id="input-work-days"
+oninput="state.formData.work_days = this.value"
 >${escapeHtml(state.formData.work_days)}</textarea>
 </div>
 <div class="input-group">
@@ -1369,6 +1381,7 @@ id="input-work-days"
 rows="2"
 placeholder="Ej: 09:00 - 18:00 hrs"
 id="input-schedule"
+oninput="state.formData.schedule = this.value"
 >${escapeHtml(state.formData.schedule)}</textarea>
 </div>
 <div class="form-buttons-container pt-4">
@@ -1392,7 +1405,7 @@ ${state.aiChatOpen ? renderAIChat() : ''}
 </div>
 `;
 }
-
+  
 function renderAIChat() {
   return `
 <div class="ai-chat-modal ${state.chatMinimized ? 'minimized' : ''}" id="ai-chat-modal">
