@@ -105,6 +105,13 @@ header.top-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);box
 header.top-header h1{color:white;text-shadow:0 2px 8px rgba(0,0,0,.2)}
 header.top-header p{color:rgba(255,255,255,.85)}
 .guest-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(34,197,94,.3)}
+
+/* === AJUSTES DE ESTILO SOLICITADOS === */
+.vacancy-card .card-content { margin-top: -8px; }
+.vacancy-card .card-content h3 { font-size: 1.25rem; /* text-xl ≈20px */ }
+.vacancy-card .card-content .job-title { font-size: 1rem; /* text-base ≈16px, -2px respecto a text-lg */ font-weight: 600; }
+.vacancy-card .card-content .description { min-height: 100px; }
+.dashboard-section-title { color: white !important; }
 </style>
 </head>
 <body>
@@ -112,1221 +119,1104 @@ header.top-header p{color:rgba(255,255,255,.85)}
 <div id="modal-root"></div>
 <script>
 console.log('🚀 Iniciando aplicación Empleos León GTO...');
-
 // ==================== CONFIGURACIÓN ====================
 const SUPABASE_URL = 'https://mecrloufrzbfcihioeve.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lY3Jsb3VmcnpiZmNpaGlvZXZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NTM2OTgsImV4cCI6MjA4NjMyOTY5OH0.Gs36EkNHv5vG2CPdrK7XtCnWvX5NYkyPY9moTdezbVA';
 const SUPABASE_REDIRECT_URL = 'https://flavioalejandrov24-lang.github.io/empleosleongto/';
-
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 // ==================== ESTADO GLOBAL ====================
 let state = {
-  view: 'login',
-  user: null,
-  isGuest: false,
-  vacancies: [],
-  editingVacancy: null,
-  showPassword: false,
-  showConfirmPassword: false,
-  menuOpen: false,
-  acceptedTerms: false,
-  loading: false,
-  isRendering: false,
-  formData: {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    company: '',
-    job_title: '',
-    description: '',
-    location: '',
-    contact_phone: '',
-    publication_date: '',
-    schedule: '',
-    work_days: '',
-    imageBase64: ''
-  },
-  aiChatOpen: false,
-  aiMessages: [],
-  aiLoading: false,
-  aiImage: null,
-  aiImagePreview: null,
-  aiExtractedData: null,
-  chatMinimized: false
+view: 'login',
+user: null,
+isGuest: false,
+vacancies: [],
+editingVacancy: null,
+showPassword: false,
+showConfirmPassword: false,
+menuOpen: false,
+acceptedTerms: false,
+loading: false,
+isRendering: false,
+formData: {
+email: '',
+password: '',
+confirmPassword: '',
+company: '',
+job_title: '',
+description: '',
+location: '',
+contact_phone: '',
+publication_date: '',
+schedule: '',
+work_days: '',
+imageBase64: ''
+},
+aiChatOpen: false,
+aiMessages: [],
+aiLoading: false,
+aiImage: null,
+aiImagePreview: null,
+aiExtractedData: null,
+chatMinimized: false
 };
-
 // ==================== UTILIDADES ====================
 const showLoading = () => {
-  if (document.getElementById('loader-overlay')) return;
-  state.loading = true;
-  const loader = document.createElement('div');
-  loader.id = 'loader-overlay';
-  loader.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
-  loader.innerHTML = '<div class="loader"></div>';
-  document.body.appendChild(loader);
+if (document.getElementById('loader-overlay')) return;
+state.loading = true;
+const loader = document.createElement('div');
+loader.id = 'loader-overlay';
+loader.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+loader.innerHTML = '<div class="loader"></div>';
+document.body.appendChild(loader);
 };
-
 const hideLoading = () => {
-  state.loading = false;
-  const loader = document.getElementById('loader-overlay');
-  if (loader) loader.remove();
+state.loading = false;
+const loader = document.getElementById('loader-overlay');
+if (loader) loader.remove();
 };
-
 const showModal = (type, title, message) => {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  const colors = {
-    success: '#16a34a',
-    error: '#dc2626',
-    warning: '#d97706',
-    info: '#2563eb'
-  };
-  modal.innerHTML = `
-    <div class="modal-window">
-      <div class="modal-header" style="background:${colors[type]}">
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-        <span>${escapeHtml(title)}</span>
-      </div>
-      <div class="modal-body">${escapeHtml(message)}</div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">
-          <i class="fas fa-check"></i> Aceptar
-        </button>
-      </div>
-    </div>
-  `;
-  document.getElementById('modal-root').appendChild(modal);
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-  setTimeout(() => modal.remove(), 8000);
+const modal = document.createElement('div');
+modal.className = 'modal-overlay';
+const colors = {
+success: '#16a34a',
+error: '#dc2626',
+warning: '#d97706',
+info: '#2563eb'
 };
-
+modal.innerHTML = `
+<div class="modal-window">
+<div class="modal-header" style="background:${colors[type]}">
+<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+<span>${escapeHtml(title)}</span>
+</div>
+<div class="modal-body">${escapeHtml(message)}</div>
+<div class="modal-footer">
+<button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">
+<i class="fas fa-check"></i> Aceptar
+</button>
+</div>
+</div>
+`;
+document.getElementById('modal-root').appendChild(modal);
+modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+setTimeout(() => modal.remove(), 8000);
+};
 const escapeHtml = (text) => {
-  if (!text) return '';
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(text).replace(/[&<>"']/g, m => map[m]);
+if (!text) return '';
+const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+return String(text).replace(/[&<>"']/g, m => map[m]);
 };
-
 // ==================== RESETEO COMPLETO ====================
 function resetCompleteState() {
-  console.log('🔄 Reseteando estado completo...');
-  state.user = null;
-  state.isGuest = false;
-  state.view = 'login';
-  state.vacancies = [];
-  state.editingVacancy = null;
-  state.showPassword = false;
-  state.showConfirmPassword = false;
-  state.menuOpen = false;
-  state.acceptedTerms = false;
-  state.loading = false;
-  resetAuthForm();
-  resetJobForm();
-  clearAIData();
+console.log('🔄 Reseteando estado completo...');
+state.user = null;
+state.isGuest = false;
+state.view = 'login';
+state.vacancies = [];
+state.editingVacancy = null;
+state.showPassword = false;
+state.showConfirmPassword = false;
+state.menuOpen = false;
+state.acceptedTerms = false;
+state.loading = false;
+resetAuthForm();
+resetJobForm();
+clearAIData();
 }
-
 // ==================== AUTENTICACIÓN ====================
 async function handleLogin(e) {
-  e.preventDefault();
-  if (state.loading) return;
-  
-  const email = state.formData.email?.trim();
-  const password = state.formData.password;
-  
-  if (!email || !password) {
-    showModal('error', 'Error', 'Correo y contraseña son requeridos');
-    return;
-  }
-  
-  showLoading();
-  try {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    if (!data || !data.user) throw new Error('No se recibió información del usuario');
-    
-    console.log('✅ Login exitoso');
-  } catch (error) {
-    console.error('❌ Error login:', error);
-    showModal('error', 'Error de inicio de sesión', error.message || 'Verifica tus credenciales');
-    hideLoading();
-  }
+e.preventDefault();
+if (state.loading) return;
+const email = state.formData.email?.trim();
+const password = state.formData.password;
+if (!email || !password) {
+showModal('error', 'Error', 'Correo y contraseña son requeridos');
+return;
 }
-
+showLoading();
+try {
+const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+if (error) throw error;
+if (!data || !data.user) throw new Error('No se recibió información del usuario');
+console.log('✅ Login exitoso');
+} catch (error) {
+console.error('❌ Error login:', error);
+showModal('error', 'Error de inicio de sesión', error.message || 'Verifica tus credenciales');
+hideLoading();
+}
+}
 async function handleSignup(e) {
-  e.preventDefault();
-  if (state.loading) return;
-  
-  if (state.formData.password !== state.formData.confirmPassword) {
-    showModal('error', 'Error', 'Las contraseñas no coinciden');
-    return;
-  }
-  if (state.formData.password.length < 6) {
-    showModal('error', 'Error', 'La contraseña debe tener al menos 6 caracteres');
-    return;
-  }
-  
-  showLoading();
-  try {
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: state.formData.email.trim().toLowerCase(),
-      password: state.formData.password,
-      options: { emailRedirectTo: SUPABASE_REDIRECT_URL }
-    });
-    if (error) throw error;
-    
-    showModal('success', '¡Registro exitoso!', 'Revisa tu correo para confirmar tu cuenta');
-    state.view = 'login';
-    resetAuthForm();
-    render();
-  } catch (error) {
-    console.error('❌ Error signup:', error);
-    showModal('error', 'Error', error.message);
-  } finally {
-    hideLoading();
-  }
+e.preventDefault();
+if (state.loading) return;
+if (state.formData.password !== state.formData.confirmPassword) {
+showModal('error', 'Error', 'Las contraseñas no coinciden');
+return;
 }
-
+if (state.formData.password.length < 6) {
+showModal('error', 'Error', 'La contraseña debe tener al menos 6 caracteres');
+return;
+}
+showLoading();
+try {
+const { data, error } = await supabaseClient.auth.signUp({
+email: state.formData.email.trim().toLowerCase(),
+password: state.formData.password,
+options: { emailRedirectTo: SUPABASE_REDIRECT_URL }
+});
+if (error) throw error;
+showModal('success', '¡Registro exitoso!', 'Revisa tu correo para confirmar tu cuenta');
+state.view = 'login';
+resetAuthForm();
+render();
+} catch (error) {
+console.error('❌ Error signup:', error);
+showModal('error', 'Error', error.message);
+} finally {
+hideLoading();
+}
+}
 async function handleLogout() {
-  if (!confirm('¿Cerrar sesión?')) return;
-  
-  console.log('🚪 Cerrando sesión...');
-  showLoading();
-  
-  try {
-    resetCompleteState();
-    await supabaseClient.auth.signOut();
-    console.log('✅ Sesión cerrada');
-    render();
-  } catch (error) {
-    console.error('❌ Error logout:', error);
-    showModal('error', 'Error', 'Hubo un problema al cerrar sesión');
-  } finally {
-    hideLoading();
-  }
+if (!confirm('¿Cerrar sesión?')) return;
+console.log('🚪 Cerrando sesión...');
+showLoading();
+try {
+resetCompleteState();
+await supabaseClient.auth.signOut();
+console.log('✅ Sesión cerrada');
+render();
+} catch (error) {
+console.error('❌ Error logout:', error);
+showModal('error', 'Error', 'Hubo un problema al cerrar sesión');
+} finally {
+hideLoading();
 }
-
+}
 async function handleDeleteAccount() {
-  if (!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?')) return;
-  const conf = prompt('Escribe "ELIMINAR" para confirmar:');
-  if (conf !== 'ELIMINAR') return;
-  
-  showLoading();
-  try {
-    const { data: userVacancies } = await supabaseClient
-      .from('vacancies')
-      .select('id')
-      .eq('user_id', state.user.id);
-    
-    if (userVacancies?.length > 0) {
-      for (const v of userVacancies) {
-        await supabaseClient.from('vacancies').delete().eq('id', v.id);
-      }
-    }
-    
-    if (state.user?.id) {
-      localStorage.removeItem('terms_accepted_' + state.user.id);
-    }
-    
-    showModal('success', '¡Eliminado!', 'Tus vacantes han sido eliminadas');
-    setTimeout(() => handleLogout(), 2000);
-  } catch (error) {
-    console.error('❌ Error delete:', error);
-    showModal('error', 'Error', 'No se pudo eliminar la cuenta');
-  } finally {
-    hideLoading();
-  }
+if (!confirm('⚠️ ¿ELIMINAR tu cuenta y TODAS tus vacantes?')) return;
+const conf = prompt('Escribe "ELIMINAR" para confirmar:');
+if (conf !== 'ELIMINAR') return;
+showLoading();
+try {
+const { data: userVacancies } = await supabaseClient
+.from('vacancies')
+.select('id')
+.eq('user_id', state.user.id);
+if (userVacancies?.length > 0) {
+for (const v of userVacancies) {
+await supabaseClient.from('vacancies').delete().eq('id', v.id);
 }
-
+}
+if (state.user?.id) {
+localStorage.removeItem('terms_accepted_' + state.user.id);
+}
+showModal('success', '¡Eliminado!', 'Tus vacantes han sido eliminadas');
+setTimeout(() => handleLogout(), 2000);
+} catch (error) {
+console.error('❌ Error delete:', error);
+showModal('error', 'Error', 'No se pudo eliminar la cuenta');
+} finally {
+hideLoading();
+}
+}
 async function handleGuestAccess() {
-  console.log('👤 Acceso como invitado...');
-  showLoading();
-  
-  try {
-    state.isGuest = true;
-    state.view = 'dashboard';
-    
-    // Cargar vacantes públicas (sin autenticación)
-    await loadVacancies();
-    
-    console.log('✅ Acceso invitado exitoso. Vacantes cargadas:', state.vacancies.length);
-    render();
-    showModal('info', '¡Bienvenido!', 'Estás navegando como invitado. Podrás ver todas las vacantes pero no publicar.');
-  } catch (error) {
-    console.error('❌ Error acceso invitado:', error);
-    showModal('error', 'Error', 'No se pudo cargar las vacantes');
-    state.isGuest = false;
-    state.view = 'login';
-    render();
-  } finally {
-    hideLoading();
-  }
+console.log('👤 Acceso como invitado...');
+showLoading();
+try {
+state.isGuest = true;
+state.view = 'dashboard';
+// Cargar vacantes públicas (sin autenticación)
+await loadVacancies();
+console.log('✅ Acceso invitado exitoso. Vacantes cargadas:', state.vacancies.length);
+render();
+showModal('info', '¡Bienvenido!', 'Estás navegando como invitado. Podrás ver todas las vacantes pero no publicar.');
+} catch (error) {
+console.error('❌ Error acceso invitado:', error);
+showModal('error', 'Error', 'No se pudo cargar las vacantes');
+state.isGuest = false;
+state.view = 'login';
+render();
+} finally {
+hideLoading();
 }
-
+}
 function handleAcceptTerms() {
-  if (!state.acceptedTerms) {
-    showModal('warning', 'Términos requeridos', 'Debes aceptar los términos');
-    return;
-  }
-  if (state.user) {
-    localStorage.setItem('terms_accepted_' + state.user.id, 'true');
-  }
-  state.view = 'dashboard';
-  render();
+if (!state.acceptedTerms) {
+showModal('warning', 'Términos requeridos', 'Debes aceptar los términos');
+return;
 }
-
+if (state.user) {
+localStorage.setItem('terms_accepted_' + state.user.id, 'true');
+}
+state.view = 'dashboard';
+render();
+}
 // ==================== VACANTES ====================
 async function loadVacancies() {
-  console.log('📥 Cargando vacantes...');
-  try {
-    const { data, error } = await supabaseClient
-      .from('vacancies')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    state.vacancies = data || [];
-    console.log('✅ Vacantes cargadas:', state.vacancies.length);
-  } catch (error) {
-    console.error('❌ Error loading vacancies:', error);
-    state.vacancies = [];
-    // No mostramos modal de error aquí para no molestar al usuario
-  }
+console.log('📥 Cargando vacantes...');
+try {
+const { data, error } = await supabaseClient
+.from('vacancies')
+.select('*')
+.order('created_at', { ascending: false });
+if (error) throw error;
+state.vacancies = data || [];
+console.log('✅ Vacantes cargadas:', state.vacancies.length);
+} catch (error) {
+console.error('❌ Error loading vacancies:', error);
+state.vacancies = [];
+// No mostramos modal de error aquí para no molestar al usuario
 }
-
+}
 async function handleImageUpload(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  
-  if (file.size > 2 * 1024 * 1024) {
-    showModal('error', 'Archivo muy grande', 'Máximo 2MB');
-    e.target.value = '';
-    return;
-  }
-  
-  if (!file.type.startsWith('image/')) {
-    showModal('error', 'Tipo inválido', 'Solo imágenes');
-    e.target.value = '';
-    return;
-  }
-  
-  try {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      state.formData.imageBase64 = ev.target.result;
-      render();
-    };
-    reader.readAsDataURL(file);
-  } catch (error) {
-    console.error('❌ Error reading image:', error);
-    showModal('error', 'Error', 'No se pudo leer la imagen');
-    e.target.value = '';
-  }
+const file = e.target.files?.[0];
+if (!file) return;
+if (file.size > 2 * 1024 * 1024) {
+showModal('error', 'Archivo muy grande', 'Máximo 2MB');
+e.target.value = '';
+return;
 }
-
+if (!file.type.startsWith('image/')) {
+showModal('error', 'Tipo inválido', 'Solo imágenes');
+e.target.value = '';
+return;
+}
+try {
+const reader = new FileReader();
+reader.onload = (ev) => {
+state.formData.imageBase64 = ev.target.result;
+render();
+};
+reader.readAsDataURL(file);
+} catch (error) {
+console.error('❌ Error reading image:', error);
+showModal('error', 'Error', 'No se pudo leer la imagen');
+e.target.value = '';
+}
+}
 async function handleSaveVacancy(e) {
-  e.preventDefault();
-  if (state.loading) return;
-  
-  if (!state.formData.imageBase64) {
-    showModal('error', 'Imagen requerida', 'Debes subir una imagen');
-    return;
-  }
-  
-  if (!state.user?.id) {
-    showModal('error', 'Sesión requerida', 'Inicia sesión para publicar');
-    return;
-  }
-  
-  showLoading();
-  try {
-    const vacancyData = {
-      user_id: state.user.id,
-      company: state.formData.company?.trim() || 'SIN INFORMACIÓN',
-      job_title: state.formData.job_title?.trim() || 'SIN INFORMACIÓN',
-      description: state.formData.description?.trim() || 'SIN INFORMACIÓN',
-      location: state.formData.location?.trim() || null,
-      contact_phone: state.formData.contact_phone?.trim() || null,
-      publication_date: state.formData.publication_date?.trim() || null,
-      schedule: state.formData.schedule?.trim() || null,
-      work_days: state.formData.work_days?.trim() || null,
-      image_base64: state.formData.imageBase64
-    };
-    
-    let result;
-    if (state.editingVacancy) {
-      result = await supabaseClient
-        .from('vacancies')
-        .update(vacancyData)
-        .eq('id', state.editingVacancy.id);
-    } else {
-      result = await supabaseClient
-        .from('vacancies')
-        .insert([vacancyData]);
-    }
-    
-    if (result.error) throw result.error;
-    
-    const wasEditing = !!state.editingVacancy;
-    state.editingVacancy = null;
-    resetJobForm();
-    clearAIData();
-    await loadVacancies();
-    state.view = 'dashboard';
-    render();
-    showModal('success', '¡Éxito!', wasEditing ? 'Vacante actualizada' : 'Vacante publicada');
-  } catch (error) {
-    console.error('❌ Error saving:', error);
-    showModal('error', 'Error', error.message || 'No se pudo guardar');
-  } finally {
-    hideLoading();
-  }
+e.preventDefault();
+if (state.loading) return;
+if (!state.formData.imageBase64) {
+showModal('error', 'Imagen requerida', 'Debes subir una imagen');
+return;
 }
-
+if (!state.user?.id) {
+showModal('error', 'Sesión requerida', 'Inicia sesión para publicar');
+return;
+}
+showLoading();
+try {
+const vacancyData = {
+user_id: state.user.id,
+company: state.formData.company?.trim() || 'SIN INFORMACIÓN',
+job_title: state.formData.job_title?.trim() || 'SIN INFORMACIÓN',
+description: state.formData.description?.trim() || 'SIN INFORMACIÓN',
+location: state.formData.location?.trim() || null,
+contact_phone: state.formData.contact_phone?.trim() || null,
+publication_date: state.formData.publication_date?.trim() || null,
+schedule: state.formData.schedule?.trim() || null,
+work_days: state.formData.work_days?.trim() || null,
+image_base64: state.formData.imageBase64
+};
+let result;
+if (state.editingVacancy) {
+result = await supabaseClient
+.from('vacancies')
+.update(vacancyData)
+.eq('id', state.editingVacancy.id);
+} else {
+result = await supabaseClient
+.from('vacancies')
+.insert([vacancyData]);
+}
+if (result.error) throw result.error;
+const wasEditing = !!state.editingVacancy;
+state.editingVacancy = null;
+resetJobForm();
+clearAIData();
+await loadVacancies();
+state.view = 'dashboard';
+render();
+showModal('success', '¡Éxito!', wasEditing ? 'Vacante actualizada' : 'Vacante publicada');
+} catch (error) {
+console.error('❌ Error saving:', error);
+showModal('error', 'Error', error.message || 'No se pudo guardar');
+} finally {
+hideLoading();
+}
+}
 async function handleDeleteVacancy(vacancyId) {
-  const vacancy = state.vacancies.find(v => v.id === vacancyId);
-  if (!vacancy || !confirm(`¿Eliminar vacante de ${vacancy.company}?`)) return;
-  
-  showLoading();
-  try {
-    const { error } = await supabaseClient.from('vacancies').delete().eq('id', vacancy.id);
-    if (error) throw error;
-    await loadVacancies();
-    render();
-    showModal('success', '¡Eliminado!', 'Vacante eliminada');
-  } catch (error) {
-    console.error('❌ Error delete vacancy:', error);
-    showModal('error', 'Error', 'No se pudo eliminar');
-  } finally {
-    hideLoading();
-  }
+const vacancy = state.vacancies.find(v => v.id === vacancyId);
+if (!vacancy || !confirm(`¿Eliminar vacante de ${vacancy.company}?`)) return;
+showLoading();
+try {
+const { error } = await supabaseClient.from('vacancies').delete().eq('id', vacancy.id);
+if (error) throw error;
+await loadVacancies();
+render();
+showModal('success', '¡Eliminado!', 'Vacante eliminada');
+} catch (error) {
+console.error('❌ Error delete vacancy:', error);
+showModal('error', 'Error', 'No se pudo eliminar');
+} finally {
+hideLoading();
 }
-
+}
 function handleEditVacancy(vacancyId) {
-  const vacancy = state.vacancies.find(v => v.id === vacancyId);
-  if (!vacancy) return;
-  
-  state.editingVacancy = vacancy;
-  state.formData = {
-    company: vacancy.company || '',
-    job_title: vacancy.job_title || '',
-    description: vacancy.description || '',
-    location: vacancy.location || '',
-    contact_phone: vacancy.contact_phone || '',
-    publication_date: vacancy.publication_date || '',
-    schedule: vacancy.schedule || '',
-    work_days: vacancy.work_days || '',
-    imageBase64: vacancy.image_base64 || '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  };
-  clearAIData();
-  state.view = 'form';
-  render();
+const vacancy = state.vacancies.find(v => v.id === vacancyId);
+if (!vacancy) return;
+state.editingVacancy = vacancy;
+state.formData = {
+company: vacancy.company || '',
+job_title: vacancy.job_title || '',
+description: vacancy.description || '',
+location: vacancy.location || '',
+contact_phone: vacancy.contact_phone || '',
+publication_date: vacancy.publication_date || '',
+schedule: vacancy.schedule || '',
+work_days: vacancy.work_days || '',
+imageBase64: vacancy.image_base64 || '',
+email: '',
+password: '',
+confirmPassword: ''
+};
+clearAIData();
+state.view = 'form';
+render();
 }
-
 // ==================== IA ====================
 function toggleAIChat() {
-  state.aiChatOpen = !state.aiChatOpen;
-  if (state.aiChatOpen && state.aiMessages.length === 0) {
-    state.aiMessages = [{
-      role: 'bot',
-      content: '¡Hola! Envíame una imagen o describe la vacante y te ayudo a llenar el formulario. 📋✨'
-    }];
-  }
-  render();
+state.aiChatOpen = !state.aiChatOpen;
+if (state.aiChatOpen && state.aiMessages.length === 0) {
+state.aiMessages = [{
+role: 'bot',
+content: '¡Hola! Envíame una imagen o describe la vacante y te ayudo a llenar el formulario. 📋✨'
+}];
 }
-
+render();
+}
 async function sendAIMessage() {
-  const input = document.getElementById('ai-chat-input');
-  const message = input?.value.trim();
-  
-  if (!message && !state.aiImage) {
-    showModal('info', 'Mensaje vacío', 'Escribe algo o sube una imagen');
-    return;
-  }
-  
-  if (message) {
-    state.aiMessages.push({ role: 'user', content: message });
-  }
-  
-  state.aiLoading = true;
-  render();
-  
-  try {
-    const requestData = { text: message || '' };
-    
-    if (state.aiImage) {
-      const reader = new FileReader();
-      const base64 = await new Promise((resolve, reject) => {
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('Error al leer imagen'));
-        reader.readAsDataURL(state.aiImage);
-      });
-      requestData.image = base64;
-    }
-    
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/extract-vacancy`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(requestData)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}`);
-    }
-    
-    const data = await response.json();
-    state.aiMessages.push({
-      role: 'bot',
-      content: data.message || 'Datos procesados. Presiona START para llenar el formulario. ✅'
-    });
-    
-    if (data.formData) {
-      state.aiExtractedData = data.formData;
-    }
-  } catch (error) {
-    console.error('❌ Error IA:', error);
-    state.aiMessages.push({
-      role: 'bot',
-      content: `Error: ${error.message}. Intenta nuevamente. 🔄`
-    });
-  } finally {
-    state.aiLoading = false;
-    if (input) input.value = '';
-    state.aiImage = null;
-    state.aiImagePreview = null;
-    render();
-    
-    setTimeout(() => {
-      const msgs = document.querySelector('.ai-chat-messages');
-      if (msgs) msgs.scrollTop = msgs.scrollHeight;
-    }, 100);
-  }
+const input = document.getElementById('ai-chat-input');
+const message = input?.value.trim();
+if (!message && !state.aiImage) {
+showModal('info', 'Mensaje vacío', 'Escribe algo o sube una imagen');
+return;
 }
-
+if (message) {
+state.aiMessages.push({ role: 'user', content: message });
+}
+state.aiLoading = true;
+render();
+try {
+const requestData = { text: message || '' };
+if (state.aiImage) {
+const reader = new FileReader();
+const base64 = await new Promise((resolve, reject) => {
+reader.onload = (e) => resolve(e.target.result);
+reader.onerror = () => reject(new Error('Error al leer imagen'));
+reader.readAsDataURL(state.aiImage);
+});
+requestData.image = base64;
+}
+const response = await fetch(`${SUPABASE_URL}/functions/v1/extract-vacancy`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+},
+body: JSON.stringify(requestData)
+});
+if (!response.ok) {
+throw new Error(`Error ${response.status}`);
+}
+const data = await response.json();
+state.aiMessages.push({
+role: 'bot',
+content: data.message || 'Datos procesados. Presiona START para llenar el formulario. ✅'
+});
+if (data.formData) {
+state.aiExtractedData = data.formData;
+}
+} catch (error) {
+console.error('❌ Error IA:', error);
+state.aiMessages.push({
+role: 'bot',
+content: `Error: ${error.message}. Intenta nuevamente. 🔄`
+});
+} finally {
+state.aiLoading = false;
+if (input) input.value = '';
+state.aiImage = null;
+state.aiImagePreview = null;
+render();
+setTimeout(() => {
+const msgs = document.querySelector('.ai-chat-messages');
+if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}, 100);
+}
+}
 function startAutofill() {
-  if (!state.aiExtractedData) {
-    showModal('info', 'Sin datos', 'Primero envía información para procesar');
-    return;
-  }
-  
-  const data = state.aiExtractedData;
-  if (data.company) state.formData.company = data.company;
-  if (data.job_title) state.formData.job_title = data.job_title;
-  if (data.description) state.formData.description = data.description;
-  if (data.location) state.formData.location = data.location;
-  if (data.contact_phone) state.formData.contact_phone = data.contact_phone;
-  if (data.publication_date) state.formData.publication_date = data.publication_date;
-  if (data.schedule) state.formData.schedule = data.schedule;
-  if (data.work_days) state.formData.work_days = data.work_days;
-  
-  state.aiChatOpen = false;
-  state.aiMessages = [];
-  state.aiExtractedData = null;
-  render();
-  showModal('success', '¡Formulario rellenado!', 'Revisa y ajusta antes de guardar ✨');
+if (!state.aiExtractedData) {
+showModal('info', 'Sin datos', 'Primero envía información para procesar');
+return;
 }
-
+const data = state.aiExtractedData;
+if (data.company) state.formData.company = data.company;
+if (data.job_title) state.formData.job_title = data.job_title;
+if (data.description) state.formData.description = data.description;
+if (data.location) state.formData.location = data.location;
+if (data.contact_phone) state.formData.contact_phone = data.contact_phone;
+if (data.publication_date) state.formData.publication_date = data.publication_date;
+if (data.schedule) state.formData.schedule = data.schedule;
+if (data.work_days) state.formData.work_days = data.work_days;
+state.aiChatOpen = false;
+state.aiMessages = [];
+state.aiExtractedData = null;
+render();
+showModal('success', '¡Formulario rellenado!', 'Revisa y ajusta antes de guardar ✨');
+}
 function handleAIImageUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  
-  if (file.size > 10 * 1024 * 1024) {
-    showModal('error', 'Archivo Grande', 'Máximo 10MB');
-    event.target.value = '';
-    return;
-  }
-  
-  state.aiImage = file;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    state.aiImagePreview = e.target.result;
-    render();
-  };
-  reader.readAsDataURL(file);
+const file = event.target.files?.[0];
+if (!file) return;
+if (file.size > 10 * 1024 * 1024) {
+showModal('error', 'Archivo Grande', 'Máximo 10MB');
+event.target.value = '';
+return;
 }
-
+state.aiImage = file;
+const reader = new FileReader();
+reader.onload = (e) => {
+state.aiImagePreview = e.target.result;
+render();
+};
+reader.readAsDataURL(file);
+}
 function removeAIImage() {
-  state.aiImage = null;
-  state.aiImagePreview = null;
-  render();
+state.aiImage = null;
+state.aiImagePreview = null;
+render();
 }
-
 function clearAIData() {
-  state.aiChatOpen = false;
-  state.aiMessages = [];
-  state.aiLoading = false;
-  state.aiImage = null;
-  state.aiImagePreview = null;
-  state.aiExtractedData = null;
-  state.chatMinimized = false;
+state.aiChatOpen = false;
+state.aiMessages = [];
+state.aiLoading = false;
+state.aiImage = null;
+state.aiImagePreview = null;
+state.aiExtractedData = null;
+state.chatMinimized = false;
 }
-
 // ==================== FORMULARIO ====================
 function cleanForm() {
-  if (!confirm('¿Limpiar todos los campos?')) return;
-  resetJobForm();
-  clearAIData();
-  render();
+if (!confirm('¿Limpiar todos los campos?')) return;
+resetJobForm();
+clearAIData();
+render();
 }
-
 function cancelForm() {
-  if (!confirm('¿Cancelar? Los cambios se perderán')) return;
-  state.editingVacancy = null;
-  state.view = 'dashboard';
-  resetJobForm();
-  clearAIData();
-  render();
+if (!confirm('¿Cancelar? Los cambios se perderán')) return;
+state.editingVacancy = null;
+state.view = 'dashboard';
+resetJobForm();
+clearAIData();
+render();
 }
-
 function resetAuthForm() {
-  state.formData.email = '';
-  state.formData.password = '';
-  state.formData.confirmPassword = '';
+state.formData.email = '';
+state.formData.password = '';
+state.formData.confirmPassword = '';
 }
-
 function resetJobForm() {
-  state.formData.company = '';
-  state.formData.job_title = '';
-  state.formData.description = '';
-  state.formData.location = '';
-  state.formData.contact_phone = '';
-  state.formData.publication_date = '';
-  state.formData.schedule = '';
-  state.formData.work_days = '';
-  state.formData.imageBase64 = '';
+state.formData.company = '';
+state.formData.job_title = '';
+state.formData.description = '';
+state.formData.location = '';
+state.formData.contact_phone = '';
+state.formData.publication_date = '';
+state.formData.schedule = '';
+state.formData.work_days = '';
+state.formData.imageBase64 = '';
 }
-
 // ==================== RENDER ====================
 function render() {
-  if (state.isRendering) {
-    console.log('⏸️ Render ya en progreso, saltando...');
-    return;
-  }
-  
-  state.isRendering = true;
-  
-  const app = document.getElementById('app');
-  if (!app) {
-    state.isRendering = false;
-    return;
-  }
-  
-  let content = '';
-  switch (state.view) {
-    case 'login':
-      content = renderLogin();
-      break;
-    case 'signup':
-      content = renderSignup();
-      break;
-    case 'terms':
-      content = renderTerms();
-      break;
-    case 'dashboard':
-      content = renderDashboard();
-      break;
-    case 'form':
-      content = renderForm();
-      break;
-    default:
-      content = renderLogin();
-  }
-  
-  app.innerHTML = content;
-  attachEvents();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  
-  state.isRendering = false;
+if (state.isRendering) {
+console.log('⏸️ Render ya en progreso, saltando...');
+return;
 }
-
+state.isRendering = true;
+const app = document.getElementById('app');
+if (!app) {
+state.isRendering = false;
+return;
+}
+let content = '';
+switch (state.view) {
+case 'login':
+content = renderLogin();
+break;
+case 'signup':
+content = renderSignup();
+break;
+case 'terms':
+content = renderTerms();
+break;
+case 'dashboard':
+content = renderDashboard();
+break;
+case 'form':
+content = renderForm();
+break;
+default:
+content = renderLogin();
+}
+app.innerHTML = content;
+attachEvents();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+state.isRendering = false;
+}
 function renderLogin() {
-  return `
-    <div class="min-h-screen flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full fade-in">
-        <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-center text-white">
-          <div class="text-6xl mb-4">💼</div>
-          <h1 class="text-3xl font-black mb-2">Empleos León GTO</h1>
-          <p class="text-purple-200">Portal de Vacantes</p>
-        </div>
-        <form id="login-form" class="p-8 space-y-6">
-          <div class="input-group">
-            <label>Correo Electrónico</label>
-            <input type="email" id="email" required placeholder="tu@email.com" value="${escapeHtml(state.formData.email)}">
-          </div>
-          <div class="input-group">
-            <label>Contraseña</label>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="password" required placeholder="••••••••" value="${escapeHtml(state.formData.password)}">
-            <span class="input-icon" id="toggle-pwd">
-              <i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
-            </span>
-          </div>
-          <button type="submit" class="btn btn-primary w-full" ${state.loading ? 'disabled' : ''}>
-            ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Iniciando...' : '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión'}
-          </button>
-          <div class="text-center space-y-3">
-            <div class="text-sm text-gray-600">
-              ¿No tienes cuenta? <button type="button" id="go-signup" class="text-purple-600 hover:underline font-semibold">Regístrate</button>
-            </div>
-            <div class="flex items-center justify-center">
-              <button type="button" id="guest-btn" class="guest-access-link">
-                <span class="hand-icon">👉</span>
-                <span>Continuar como invitado</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  `;
+return `
+<div class="min-h-screen flex items-center justify-center p-4">
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full fade-in">
+<div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-center text-white">
+<div class="text-6xl mb-4">💼</div>
+<h1 class="text-3xl font-black mb-2">Empleos León GTO</h1>
+<p class="text-purple-200">Portal de Vacantes</p>
+</div>
+<form id="login-form" class="p-8 space-y-6">
+<div class="input-group">
+<label>Correo Electrónico</label>
+<input type="email" id="email" required placeholder="tu@email.com" value="${escapeHtml(state.formData.email)}">
+</div>
+<div class="input-group">
+<label>Contraseña</label>
+<input type="${state.showPassword ? 'text' : 'password'}" id="password" required placeholder="••••••••" value="${escapeHtml(state.formData.password)}">
+<span class="input-icon" id="toggle-pwd">
+<i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
+</span>
+</div>
+<button type="submit" class="btn btn-primary w-full" ${state.loading ? 'disabled' : ''}>
+${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Iniciando...' : '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión'}
+</button>
+<div class="text-center space-y-3">
+<div class="text-sm text-gray-600">
+¿No tienes cuenta? <button type="button" id="go-signup" class="text-purple-600 hover:underline font-semibold">Regístrate</button>
+</div>
+<div class="flex items-center justify-center">
+<button type="button" id="guest-btn" class="guest-access-link">
+<span class="hand-icon">👉</span>
+<span>Continuar como invitado</span>
+</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+`;
 }
-
 function renderSignup() {
-  return `
-    <div class="min-h-screen flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full fade-in">
-        <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-center text-white">
-          <div class="text-6xl mb-4">📝</div>
-          <h1 class="text-3xl font-black mb-2">Crear Cuenta</h1>
-          <p class="text-purple-200">Únete al portal</p>
-        </div>
-        <form id="signup-form" class="p-8 space-y-6">
-          <div class="input-group">
-            <label>Correo</label>
-            <input type="email" id="email" required placeholder="tu@email.com" value="${escapeHtml(state.formData.email)}">
-          </div>
-          <div class="input-group">
-            <label>Contraseña</label>
-            <input type="${state.showPassword ? 'text' : 'password'}" id="password" required placeholder="Mínimo 6 caracteres" value="${escapeHtml(state.formData.password)}">
-            <span class="input-icon" id="toggle-pwd">
-              <i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
-            </span>
-          </div>
-          <div class="input-group">
-            <label>Confirmar Contraseña</label>
-            <input type="${state.showConfirmPassword ? 'text' : 'password'}" id="confirm-password" required placeholder="Repite tu contraseña" value="${escapeHtml(state.formData.confirmPassword)}">
-            <span class="input-icon" id="toggle-confirm-pwd">
-              <i class="fas ${state.showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
-            </span>
-          </div>
-          <button type="submit" class="btn btn-primary w-full" ${state.loading ? 'disabled' : ''}>
-            ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Creando...' : '<i class="fas fa-user-plus"></i> Crear Cuenta'}
-          </button>
-          <div class="text-center text-sm">
-            ¿Ya tienes cuenta? <button type="button" id="go-login" class="text-purple-600 hover:underline font-semibold">Inicia Sesión</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  `;
+return `
+<div class="min-h-screen flex items-center justify-center p-4">
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full fade-in">
+<div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-center text-white">
+<div class="text-6xl mb-4">📝</div>
+<h1 class="text-3xl font-black mb-2">Crear Cuenta</h1>
+<p class="text-purple-200">Únete al portal</p>
+</div>
+<form id="signup-form" class="p-8 space-y-6">
+<div class="input-group">
+<label>Correo</label>
+<input type="email" id="email" required placeholder="tu@email.com" value="${escapeHtml(state.formData.email)}">
+</div>
+<div class="input-group">
+<label>Contraseña</label>
+<input type="${state.showPassword ? 'text' : 'password'}" id="password" required placeholder="Mínimo 6 caracteres" value="${escapeHtml(state.formData.password)}">
+<span class="input-icon" id="toggle-pwd">
+<i class="fas ${state.showPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
+</span>
+</div>
+<div class="input-group">
+<label>Confirmar Contraseña</label>
+<input type="${state.showConfirmPassword ? 'text' : 'password'}" id="confirm-password" required placeholder="Repite tu contraseña" value="${escapeHtml(state.formData.confirmPassword)}">
+<span class="input-icon" id="toggle-confirm-pwd">
+<i class="fas ${state.showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}"></i>
+</span>
+</div>
+<button type="submit" class="btn btn-primary w-full" ${state.loading ? 'disabled' : ''}>
+${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Creando...' : '<i class="fas fa-user-plus"></i> Crear Cuenta'}
+</button>
+<div class="text-center text-sm">
+¿Ya tienes cuenta? <button type="button" id="go-login" class="text-purple-600 hover:underline font-semibold">Inicia Sesión</button>
+</div>
+</form>
+</div>
+</div>
+`;
 }
-
 function renderTerms() {
-  return `
-    <div class="min-h-screen flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full fade-in">
-        <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-white">
-          <h2 class="text-3xl font-black mb-2">Términos y Condiciones</h2>
-          <p class="text-purple-200">Lee y acepta para continuar</p>
-        </div>
-        <div class="p-8 space-y-6 max-h-96 overflow-y-auto">
-          <div class="space-y-4 text-gray-700">
-            <h3 class="font-bold text-xl">1. Uso del Portal</h3>
-            <p>Portal para publicar ofertas de empleo en León, Guanajuato.</p>
-            <h3 class="font-bold text-xl">2. Responsabilidad</h3>
-            <p>Los usuarios son responsables de la veracidad de la información.</p>
-          </div>
-          <div class="flex items-center gap-3 bg-purple-50 p-4 rounded-xl">
-            <input type="checkbox" id="accept-terms" ${state.acceptedTerms ? 'checked' : ''} class="w-5 h-5">
-            <label for="accept-terms" class="text-sm font-semibold cursor-pointer">Acepto los términos</label>
-          </div>
-        </div>
-        <div class="p-8 pt-0">
-          <button id="accept-btn" class="btn btn-primary w-full" ${!state.acceptedTerms ? 'disabled' : ''}>
-            <i class="fas fa-check"></i> Continuar
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
+return `
+<div class="min-h-screen flex items-center justify-center p-4">
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full fade-in">
+<div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-white">
+<h2 class="text-3xl font-black mb-2">Términos y Condiciones</h2>
+<p class="text-purple-200">Lee y acepta para continuar</p>
+</div>
+<div class="p-8 space-y-6 max-h-96 overflow-y-auto">
+<div class="space-y-4 text-gray-700">
+<h3 class="font-bold text-xl">1. Uso del Portal</h3>
+<p>Portal para publicar ofertas de empleo en León, Guanajuato.</p>
+<h3 class="font-bold text-xl">2. Responsabilidad</h3>
+<p>Los usuarios son responsables de la veracidad de la información.</p>
+</div>
+<div class="flex items-center gap-3 bg-purple-50 p-4 rounded-xl">
+<input type="checkbox" id="accept-terms" ${state.acceptedTerms ? 'checked' : ''} class="w-5 h-5">
+<label for="accept-terms" class="text-sm font-semibold cursor-pointer">Acepto los términos</label>
+</div>
+</div>
+<div class="p-8 pt-0">
+<button id="accept-btn" class="btn btn-primary w-full" ${!state.acceptedTerms ? 'disabled' : ''}>
+<i class="fas fa-check"></i> Continuar
+</button>
+</div>
+</div>
+</div>
+`;
 }
-
 function renderDashboard() {
-  const userVacancies = state.user ? state.vacancies.filter(v => v.user_id === state.user.id) : [];
-  const otherVacancies = state.user ? state.vacancies.filter(v => v.user_id !== state.user.id) : state.vacancies;
-  
-  return `
-    <div class="min-h-screen">
-      <header class="bg-white shadow-lg sticky top-0 z-50 top-header">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3">
-              <div class="text-4xl">💼</div>
-              <div>
-                <h1 class="text-2xl font-black">Empleos León GTO</h1>
-                <p class="text-sm">${state.vacancies.length} vacantes disponibles</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-4">
-              ${state.isGuest ? `
-                <span class="guest-badge">
-                  <i class="fas fa-eye"></i>
-                  Modo Invitado
-                </span>
-                <button id="go-login" class="btn btn-outline">
-                  <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                </button>
-              ` : state.user ? `
-                <button id="new-vacancy" class="btn btn-new-vacancy">
-                  <i class="fas fa-plus"></i> Nueva Vacante
-                </button>
-                <div class="relative">
-                  <button id="user-menu" class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center">
-                    <i class="fas fa-user"></i>
-                  </button>
-                  ${state.menuOpen ? `
-                    <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2">
-                      <div class="px-4 py-2 border-b">
-                        <p class="text-xs text-gray-500">Sesión</p>
-                        <p class="text-sm font-semibold truncate">${escapeHtml(state.user.email)}</p>
-                      </div>
-                      <button id="logout" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                      </button>
-                      <button id="delete-account" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex items-center gap-2">
-                        <i class="fas fa-trash"></i> Eliminar Cuenta
-                      </button>
-                    </div>
-                  ` : ''}
-                </div>
-              ` : `
-                <button id="go-login" class="btn btn-outline">
-                  <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                </button>
-              `}
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      <main class="max-w-7xl mx-auto px-4 py-8">
-        ${userVacancies.length > 0 ? `
-          <section class="mb-12">
-            <h2 class="text-2xl font-black mb-6">
-              <i class="fas fa-briefcase text-purple-600"></i> Mis Vacantes
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              ${userVacancies.map(v => renderVacancyCard(v, true)).join('')}
-            </div>
-          </section>
-        ` : ''}
-        
-        <section>
-          <h2 class="text-2xl font-black mb-6">
-            <i class="fas fa-search text-purple-600"></i> ${state.user ? 'Otras Vacantes' : 'Todas las Vacantes'}
-          </h2>
-          ${state.vacancies.length === 0 ? `
-            <div class="text-center py-16">
-              <div class="text-6xl mb-4">📭</div>
-              <p class="text-xl text-gray-600">No hay vacantes disponibles</p>
-              ${state.isGuest ? `
-                <p class="text-gray-500 mt-2">Regístrate para publicar la primera vacante</p>
-                <button id="go-signup-from-empty" class="btn btn-primary mt-4">
-                  <i class="fas fa-user-plus"></i> Crear Cuenta
-                </button>
-              ` : ''}
-            </div>
-          ` : otherVacancies.length === 0 && !state.isGuest ? `
-            <div class="text-center py-16">
-              <div class="text-6xl mb-4">🎉</div>
-              <p class="text-xl text-gray-600">¡Eres el primero! Solo tú has publicado vacantes</p>
-            </div>
-          ` : `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              ${otherVacancies.map(v => renderVacancyCard(v, false)).join('')}
-            </div>
-          `}
-        </section>
-      </main>
-    </div>
-  `;
+const userVacancies = state.user ? state.vacancies.filter(v => v.user_id === state.user.id) : [];
+const otherVacancies = state.user ? state.vacancies.filter(v => v.user_id !== state.user.id) : state.vacancies;
+return `
+<div class="min-h-screen">
+<header class="bg-white shadow-lg sticky top-0 z-50 top-header">
+<div class="max-w-7xl mx-auto px-4 py-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="text-4xl">💼</div>
+<div>
+<h1 class="text-2xl font-black">Empleos León GTO</h1>
+<p class="text-sm">${state.vacancies.length} vacantes disponibles</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+${state.isGuest ? `
+<span class="guest-badge">
+<i class="fas fa-eye"></i>
+Modo Invitado
+</span>
+<button id="go-login" class="btn btn-outline">
+<i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+</button>
+` : state.user ? `
+<button id="new-vacancy" class="btn btn-new-vacancy">
+<i class="fas fa-plus"></i> + 📆
+</button>
+<div class="relative">
+<button id="user-menu" class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center">
+<i class="fas fa-user"></i>
+</button>
+${state.menuOpen ? `
+<div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2">
+<div class="px-4 py-2 border-b">
+<p class="text-xs text-gray-500">Sesión</p>
+<p class="text-sm font-semibold truncate">${escapeHtml(state.user.email)}</p>
+</div>
+<button id="logout" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
+<i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+</button>
+<button id="delete-account" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex items-center gap-2">
+<i class="fas fa-trash"></i> Eliminar Cuenta
+</button>
+</div>
+` : ''}
+</div>
+` : `
+<button id="go-login" class="btn btn-outline">
+<i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+</button>
+`}
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-8">
+${userVacancies.length > 0 ? `
+<section class="mb-12">
+<h2 class="text-2xl font-black mb-6 dashboard-section-title">
+<i class="fas fa-briefcase text-purple-600"></i> Mis Vacantes
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+${userVacancies.map(v => renderVacancyCard(v, true)).join('')}
+</div>
+</section>
+` : ''}
+<section>
+<h2 class="text-2xl font-black mb-6 dashboard-section-title">
+<i class="fas fa-search text-purple-600"></i> ${state.user ? 'Otras Vacantes' : 'Todas las Vacantes'}
+</h2>
+${state.vacancies.length === 0 ? `
+<div class="text-center py-16">
+<div class="text-6xl mb-4">📭</div>
+<p class="text-xl text-gray-600">No hay vacantes disponibles</p>
+${state.isGuest ? `
+<p class="text-gray-500 mt-2">Regístrate para publicar la primera vacante</p>
+<button id="go-signup-from-empty" class="btn btn-primary mt-4">
+<i class="fas fa-user-plus"></i> Crear Cuenta
+</button>
+` : ''}
+</div>
+` : otherVacancies.length === 0 && !state.isGuest ? `
+<div class="text-center py-16">
+<div class="text-6xl mb-4">🎉</div>
+<p class="text-xl text-gray-600">¡Eres el primero! Solo tú has publicado vacantes</p>
+</div>
+` : `
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+${otherVacancies.map(v => renderVacancyCard(v, false)).join('')}
+</div>
+`}
+</section>
+</main>
+</div>
+`;
 }
-
 function renderVacancyCard(vacancy, isOwner) {
-  return `
-    <div class="vacancy-card">
-      <div class="h-48 bg-gray-200 overflow-hidden">
-        ${vacancy.image_base64 ? `
-          <img src="${escapeHtml(vacancy.image_base64)}" alt="${escapeHtml(vacancy.company)}" class="w-full h-full object-cover">
-        ` : `
-          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-purple-600">
-            <i class="fas fa-image text-white text-6xl opacity-50"></i>
-          </div>
-        `}
-      </div>
-      <div class="p-6">
-        <h3 class="text-xl font-bold mb-2 truncate">${escapeHtml(vacancy.company)}</h3>
-        <p class="text-lg text-purple-600 font-semibold mb-3 truncate">${escapeHtml(vacancy.job_title)}</p>
-        <p class="text-sm text-gray-600 mb-4 line-clamp-3">${escapeHtml(vacancy.description)}</p>
-        
-        <div class="space-y-2 mb-4 text-sm text-gray-700">
-          ${vacancy.location ? `<div class="flex items-start gap-2"><i class="fas fa-map-marker-alt text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.location)}</span></div>` : ''}
-          ${vacancy.contact_phone ? `<div class="flex items-start gap-2"><i class="fas fa-phone text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.contact_phone)}</span></div>` : ''}
-          ${vacancy.publication_date ? `<div class="flex items-start gap-2"><i class="fas fa-calendar text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.publication_date)}</span></div>` : ''}
-          ${vacancy.work_days ? `<div class="flex items-start gap-2"><i class="fas fa-calendar-alt text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.work_days)}</span></div>` : ''}
-          ${vacancy.schedule ? `<div class="flex items-start gap-2"><i class="fas fa-clock text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.schedule)}</span></div>` : ''}
-        </div>
-        
-        ${isOwner ? `
-          <div class="flex gap-2 pt-4 border-t">
-            <button data-edit="${vacancy.id}" class="flex-1 btn btn-outline btn-compact">
-              <i class="fas fa-edit"></i> Editar
-            </button>
-            <button data-delete="${vacancy.id}" class="flex-1 btn btn-cancel btn-compact">
-              <i class="fas fa-trash"></i> Eliminar
-            </button>
-          </div>
-        ` : ''}
-      </div>
-    </div>
-  `;
+return `
+<div class="vacancy-card">
+<div class="h-48 bg-gray-200 overflow-hidden">
+${vacancy.image_base64 ? `
+<img src="${escapeHtml(vacancy.image_base64)}" alt="${escapeHtml(vacancy.company)}" class="w-full h-full object-cover">
+` : `
+<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-purple-600">
+<i class="fas fa-image text-white text-6xl opacity-50"></i>
+</div>
+`}
+</div>
+<div class="p-6 card-content">
+<h3 class="font-bold mb-2 truncate">${escapeHtml(vacancy.company)}</h3>
+<p class="job-title text-purple-600 mb-3 truncate">${escapeHtml(vacancy.job_title)}</p>
+<p class="text-sm text-gray-600 mb-4 line-clamp-3 description">${escapeHtml(vacancy.description)}</p>
+<div class="space-y-2 mb-4 text-sm text-gray-700">
+${vacancy.location ? `<div class="flex items-start gap-2"><i class="fas fa-map-marker-alt text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.location)}</span></div>` : ''}
+${vacancy.contact_phone ? `<div class="flex items-start gap-2"><i class="fas fa-phone text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.contact_phone)}</span></div>` : ''}
+${vacancy.publication_date ? `<div class="flex items-start gap-2"><i class="fas fa-calendar text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.publication_date)}</span></div>` : ''}
+${vacancy.work_days ? `<div class="flex items-start gap-2"><i class="fas fa-calendar-alt text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.work_days)}</span></div>` : ''}
+${vacancy.schedule ? `<div class="flex items-start gap-2"><i class="fas fa-clock text-purple-600 mt-1"></i><span>${escapeHtml(vacancy.schedule)}</span></div>` : ''}
+</div>
+${isOwner ? `
+<div class="flex gap-2 pt-4 border-t">
+<button data-edit="${vacancy.id}" class="flex-1 btn btn-outline btn-compact">
+<i class="fas fa-edit"></i> Editar
+</button>
+<button data-delete="${vacancy.id}" class="flex-1 btn btn-cancel btn-compact">
+<i class="fas fa-trash"></i> Eliminar
+</button>
+</div>
+` : ''}
+</div>
+</div>
+`;
 }
-
 function renderForm() {
-  return `
-    <div class="min-h-screen py-8">
-      <div class="max-w-3xl mx-auto px-4">
-        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden fade-in">
-          <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-white">
-            <h2 class="text-3xl font-black mb-2">${state.editingVacancy ? 'Editar' : 'Nueva'} Vacante</h2>
-            <p class="text-purple-200">Completa la información</p>
-          </div>
-          
-          <form id="vacancy-form" class="p-8 space-y-6">
-            <div class="input-group">
-              <label>Imagen *</label>
-              <div class="image-upload-area ${state.formData.imageBase64 ? 'has-image' : ''}">
-                ${state.formData.imageBase64 ? `
-                  <label for="img" class="cursor-pointer block">
-                    <div class="image-preview-container">
-                      <img src="${escapeHtml(state.formData.imageBase64)}" alt="Preview">
-                    </div>
-                  </label>
-                ` : `
-                  <label for="img" class="cursor-pointer block py-6">
-                    <svg class="w-16 h-16 mx-auto text-purple-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                    </svg>
-                    <p class="text-sm text-purple-600 font-semibold">Click para subir imagen</p>
-                    <p class="text-xs text-gray-500 mt-1">Máx 2MB</p>
-                  </label>
-                `}
-                <input type="file" accept="image/*" id="img" class="hidden">
-              </div>
-            </div>
-            
-            <div class="input-group">
-              <label>Empresa</label>
-              <input type="text" id="company" placeholder="Ej: Calzado León" value="${escapeHtml(state.formData.company)}">
-            </div>
-            
-            <div class="input-group">
-              <label>Puesto</label>
-              <input type="text" id="job_title" placeholder="Ej: Desarrollador" value="${escapeHtml(state.formData.job_title)}">
-            </div>
-            
-            <div class="input-group">
-              <label>Descripción</label>
-              <textarea id="description" rows="5" placeholder="Describe el puesto...">${escapeHtml(state.formData.description)}</textarea>
-            </div>
-            
-            <div class="input-group">
-              <label>Ubicación</label>
-              <input type="text" id="location" placeholder="León, GTO" value="${escapeHtml(state.formData.location)}">
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="input-group">
-                <label>Teléfono</label>
-                <input type="text" id="contact_phone" placeholder="477-123-4567" value="${escapeHtml(state.formData.contact_phone)}">
-              </div>
-              <div class="input-group">
-                <label>Fecha publicación</label>
-                <textarea id="publication_date" rows="2" placeholder="15 de enero 2025">${escapeHtml(state.formData.publication_date)}</textarea>
-              </div>
-            </div>
-            
-            <div class="input-group">
-              <label>Días de trabajo</label>
-              <textarea id="work_days" rows="2" placeholder="Lunes a Viernes">${escapeHtml(state.formData.work_days)}</textarea>
-            </div>
-            
-            <div class="input-group">
-              <label>Horario</label>
-              <textarea id="schedule" rows="2" placeholder="09:00 - 18:00">${escapeHtml(state.formData.schedule)}</textarea>
-            </div>
-            
-            <div class="form-buttons-container">
-              <button type="button" id="cancel-btn" class="btn-compact btn-cancel w-full sm:flex-1">
-                <i class="fas fa-times"></i> Cancelar
-              </button>
-              <button type="button" id="clean-btn" class="btn-compact btn-clean w-full sm:flex-1">
-                <i class="fas fa-eraser"></i> Limpiar
-              </button>
-              <button type="button" id="ai-btn" class="btn-compact btn-autofill w-full sm:flex-1">
-                <i class="fas fa-robot"></i> IA
-              </button>
-              <button type="submit" class="btn-compact btn-save w-full sm:flex-1" ${state.loading ? 'disabled' : ''}>
-                ${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Guardando...' : (state.editingVacancy ? '<i class="fas fa-edit"></i> Actualizar' : '<i class="fas fa-save"></i> Publicar')}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-      ${state.aiChatOpen ? renderAIChat() : ''}
-    </div>
-  `;
+return `
+<div class="min-h-screen py-8">
+<div class="max-w-3xl mx-auto px-4">
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden fade-in">
+<div class="bg-gradient-to-br from-purple-600 to-purple-800 p-8 text-white">
+<h2 class="text-3xl font-black mb-2">${state.editingVacancy ? 'Editar' : 'Nueva'} Vacante</h2>
+<p class="text-purple-200">Completa la información</p>
+</div>
+<form id="vacancy-form" class="p-8 space-y-6">
+<div class="input-group">
+<label>Imagen *</label>
+<div class="image-upload-area ${state.formData.imageBase64 ? 'has-image' : ''}">
+${state.formData.imageBase64 ? `
+<label for="img" class="cursor-pointer block">
+<div class="image-preview-container">
+<img src="${escapeHtml(state.formData.imageBase64)}" alt="Preview">
+</div>
+</label>
+` : `
+<label for="img" class="cursor-pointer block py-6">
+<svg class="w-16 h-16 mx-auto text-purple-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+</svg>
+<p class="text-sm text-purple-600 font-semibold">Click para subir imagen</p>
+<p class="text-xs text-gray-500 mt-1">Máx 2MB</p>
+</label>
+`}
+<input type="file" accept="image/*" id="img" class="hidden">
+</div>
+</div>
+<div class="input-group">
+<label>Empresa</label>
+<input type="text" id="company" placeholder="Ej: Calzado León" value="${escapeHtml(state.formData.company)}">
+</div>
+<div class="input-group">
+<label>Puesto</label>
+<input type="text" id="job_title" placeholder="Ej: Desarrollador" value="${escapeHtml(state.formData.job_title)}">
+</div>
+<div class="input-group">
+<label>Descripción</label>
+<textarea id="description" rows="5" placeholder="Describe el puesto...">${escapeHtml(state.formData.description)}</textarea>
+</div>
+<div class="input-group">
+<label>Ubicación</label>
+<input type="text" id="location" placeholder="León, GTO" value="${escapeHtml(state.formData.location)}">
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="input-group">
+<label>Teléfono</label>
+<input type="text" id="contact_phone" placeholder="477-123-4567" value="${escapeHtml(state.formData.contact_phone)}">
+</div>
+<div class="input-group">
+<label>Fecha publicación</label>
+<textarea id="publication_date" rows="2" placeholder="15 de enero 2025">${escapeHtml(state.formData.publication_date)}</textarea>
+</div>
+</div>
+<div class="input-group">
+<label>Días de trabajo</label>
+<textarea id="work_days" rows="2" placeholder="Lunes a Viernes">${escapeHtml(state.formData.work_days)}</textarea>
+</div>
+<div class="input-group">
+<label>Horario</label>
+<textarea id="schedule" rows="2" placeholder="09:00 - 18:00">${escapeHtml(state.formData.schedule)}</textarea>
+</div>
+<div class="form-buttons-container">
+<button type="button" id="cancel-btn" class="btn-compact btn-cancel w-full sm:flex-1">
+<i class="fas fa-times"></i> Cancelar
+</button>
+<button type="button" id="clean-btn" class="btn-compact btn-clean w-full sm:flex-1">
+<i class="fas fa-eraser"></i> Limpiar
+</button>
+<button type="button" id="ai-btn" class="btn-compact btn-autofill w-full sm:flex-1">
+<i class="fas fa-robot"></i> IA
+</button>
+<button type="submit" class="btn-compact btn-save w-full sm:flex-1" ${state.loading ? 'disabled' : ''}>
+${state.loading ? '<i class="fas fa-spinner fa-spin"></i> Guardando...' : (state.editingVacancy ? '<i class="fas fa-edit"></i> Actualizar' : '<i class="fas fa-save"></i> Publicar')}
+</button>
+</div>
+</form>
+</div>
+</div>
+${state.aiChatOpen ? renderAIChat() : ''}
+</div>
+`;
 }
-
 function renderAIChat() {
-  return `
-    <div class="ai-chat-modal ${state.chatMinimized ? 'minimized' : ''}">
-      <div class="ai-chat-header" id="ai-header">
-        <h3><i class="fas fa-robot mr-2"></i>Autofill IA</h3>
-        <div class="flex items-center gap-2">
-          <button class="close-btn" id="minimize-ai"><i class="fas fa-minus"></i></button>
-          <button class="close-btn" id="close-ai"><i class="fas fa-times"></i></button>
-        </div>
-      </div>
-      
-      <div class="ai-chat-messages">
-        ${state.aiMessages.map(m => `
-          <div class="ai-message ${m.role}">${escapeHtml(m.content)}</div>
-        `).join('')}
-        ${state.aiLoading ? '<div class="ai-message bot"><span class="ai-loading"></span> Procesando...</div>' : ''}
-      </div>
-      
-      <div class="ai-chat-input">
-        <div class="file-upload">
-          <label>
-            <i class="fas fa-paperclip mr-1"></i> Imagen
-            <input type="file" accept="image/*" id="ai-img">
-          </label>
-          ${state.aiImagePreview ? `
-            <div class="file-preview">
-              <img src="${escapeHtml(state.aiImagePreview)}" alt="Preview">
-              <button class="remove-file" id="remove-ai-img">×</button>
-            </div>
-          ` : ''}
-        </div>
-        
-        <textarea id="ai-input" placeholder="Describe la vacante..." rows="3"></textarea>
-        
-        <div class="ai-chat-actions">
-          <button id="send-ai" class="btn-send" ${state.aiLoading ? 'disabled' : ''}>
-            <i class="fas fa-paper-plane"></i> Enviar
-          </button>
-          <button id="start-ai" class="btn-start" ${!state.aiExtractedData || state.aiLoading ? 'disabled' : ''}>
-            <i class="fas fa-play"></i> START
-          </button>
-          <button id="close-ai-2" class="btn-close-chat">
-            <i class="fas fa-times"></i> Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
+return `
+<div class="ai-chat-modal ${state.chatMinimized ? 'minimized' : ''}">
+<div class="ai-chat-header" id="ai-header">
+<h3><i class="fas fa-robot mr-2"></i>Autofill IA</h3>
+<div class="flex items-center gap-2">
+<button class="close-btn" id="minimize-ai"><i class="fas fa-minus"></i></button>
+<button class="close-btn" id="close-ai"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="ai-chat-messages">
+${state.aiMessages.map(m => `
+<div class="ai-message ${m.role}">${escapeHtml(m.content)}</div>
+`).join('')}
+${state.aiLoading ? '<div class="ai-message bot"><span class="ai-loading"></span> Procesando...</div>' : ''}
+</div>
+<div class="ai-chat-input">
+<div class="file-upload">
+<label>
+<i class="fas fa-paperclip mr-1"></i> Imagen
+<input type="file" accept="image/*" id="ai-img">
+</label>
+${state.aiImagePreview ? `
+<div class="file-preview">
+<img src="${escapeHtml(state.aiImagePreview)}" alt="Preview">
+<button class="remove-file" id="remove-ai-img">×</button>
+</div>
+` : ''}
+</div>
+<textarea id="ai-input" placeholder="Describe la vacante..." rows="3"></textarea>
+<div class="ai-chat-actions">
+<button id="send-ai" class="btn-send" ${state.aiLoading ? 'disabled' : ''}>
+<i class="fas fa-paper-plane"></i> Enviar
+</button>
+<button id="start-ai" class="btn-start" ${!state.aiExtractedData || state.aiLoading ? 'disabled' : ''}>
+<i class="fas fa-play"></i> START
+</button>
+<button id="close-ai-2" class="btn-close-chat">
+<i class="fas fa-times"></i> Cerrar
+</button>
+</div>
+</div>
+</div>
+`;
 }
-
 // ==================== EVENTOS ====================
 function attachEvents() {
-  // Login
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.onsubmit = handleLogin;
-    document.getElementById('email').oninput = (e) => state.formData.email = e.target.value;
-    document.getElementById('password').oninput = (e) => state.formData.password = e.target.value;
-    document.getElementById('toggle-pwd')?.addEventListener('click', () => {
-      state.showPassword = !state.showPassword;
-      render();
-    });
-    document.getElementById('go-signup')?.addEventListener('click', () => {
-      state.view = 'signup';
-      resetAuthForm();
-      render();
-    });
-    document.getElementById('guest-btn')?.addEventListener('click', handleGuestAccess);
-  }
-  
-  // Signup
-  const signupForm = document.getElementById('signup-form');
-  if (signupForm) {
-    signupForm.onsubmit = handleSignup;
-    document.getElementById('email').oninput = (e) => state.formData.email = e.target.value;
-    document.getElementById('password').oninput = (e) => state.formData.password = e.target.value;
-    document.getElementById('confirm-password').oninput = (e) => state.formData.confirmPassword = e.target.value;
-    document.getElementById('toggle-pwd')?.addEventListener('click', () => {
-      state.showPassword = !state.showPassword;
-      render();
-    });
-    document.getElementById('toggle-confirm-pwd')?.addEventListener('click', () => {
-      state.showConfirmPassword = !state.showConfirmPassword;
-      render();
-    });
-    document.getElementById('go-login')?.addEventListener('click', () => {
-      state.view = 'login';
-      render();
-    });
-  }
-  
-  // Terms
-  document.getElementById('accept-terms')?.addEventListener('change', (e) => {
-    state.acceptedTerms = e.target.checked;
-    render();
-  });
-  document.getElementById('accept-btn')?.addEventListener('click', handleAcceptTerms);
-  
-  // Dashboard
-  document.getElementById('new-vacancy')?.addEventListener('click', () => {
-    state.view = 'form';
-    resetJobForm();
-    clearAIData();
-    render();
-  });
-  document.getElementById('user-menu')?.addEventListener('click', () => {
-    state.menuOpen = !state.menuOpen;
-    render();
-  });
-  document.getElementById('logout')?.addEventListener('click', handleLogout);
-  document.getElementById('delete-account')?.addEventListener('click', handleDeleteAccount);
-  document.getElementById('go-login')?.addEventListener('click', () => {
-    state.view = 'login';
-    render();
-  });
-  document.getElementById('go-signup-from-empty')?.addEventListener('click', () => {
-    state.view = 'signup';
-    render();
-  });
-  
-  // Vacancy cards
-  document.querySelectorAll('[data-edit]').forEach(btn => {
-    btn.addEventListener('click', () => handleEditVacancy(btn.dataset.edit));
-  });
-  document.querySelectorAll('[data-delete]').forEach(btn => {
-    btn.addEventListener('click', () => handleDeleteVacancy(btn.dataset.delete));
-  });
-  
-  // Form
-  const vacancyForm = document.getElementById('vacancy-form');
-  if (vacancyForm) {
-    vacancyForm.onsubmit = handleSaveVacancy;
-    document.getElementById('img').onchange = handleImageUpload;
-    document.getElementById('company').oninput = (e) => state.formData.company = e.target.value;
-    document.getElementById('job_title').oninput = (e) => state.formData.job_title = e.target.value;
-    document.getElementById('description').oninput = (e) => state.formData.description = e.target.value;
-    document.getElementById('location').oninput = (e) => state.formData.location = e.target.value;
-    document.getElementById('contact_phone').oninput = (e) => state.formData.contact_phone = e.target.value;
-    document.getElementById('publication_date').oninput = (e) => state.formData.publication_date = e.target.value;
-    document.getElementById('work_days').oninput = (e) => state.formData.work_days = e.target.value;
-    document.getElementById('schedule').oninput = (e) => state.formData.schedule = e.target.value;
-    document.getElementById('cancel-btn')?.addEventListener('click', cancelForm);
-    document.getElementById('clean-btn')?.addEventListener('click', cleanForm);
-    document.getElementById('ai-btn')?.addEventListener('click', toggleAIChat);
-  }
-  
-  // AI Chat
-  document.getElementById('ai-input')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendAIMessage();
-    }
-  });
-  document.getElementById('send-ai')?.addEventListener('click', sendAIMessage);
-  document.getElementById('start-ai')?.addEventListener('click', startAutofill);
-  document.getElementById('close-ai')?.addEventListener('click', () => {
-    state.aiChatOpen = false;
-    clearAIData();
-    render();
-  });
-  document.getElementById('close-ai-2')?.addEventListener('click', () => {
-    state.aiChatOpen = false;
-    clearAIData();
-    render();
-  });
-  document.getElementById('minimize-ai')?.addEventListener('click', () => {
-    state.chatMinimized = !state.chatMinimized;
-    render();
-  });
-  document.getElementById('ai-img')?.addEventListener('change', handleAIImageUpload);
-  document.getElementById('remove-ai-img')?.addEventListener('click', removeAIImage);
+// Login
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+loginForm.onsubmit = handleLogin;
+document.getElementById('email').oninput = (e) => state.formData.email = e.target.value;
+document.getElementById('password').oninput = (e) => state.formData.password = e.target.value;
+document.getElementById('toggle-pwd')?.addEventListener('click', () => {
+state.showPassword = !state.showPassword;
+render();
+});
+document.getElementById('go-signup')?.addEventListener('click', () => {
+state.view = 'signup';
+resetAuthForm();
+render();
+});
+document.getElementById('guest-btn')?.addEventListener('click', handleGuestAccess);
 }
-
+// Signup
+const signupForm = document.getElementById('signup-form');
+if (signupForm) {
+signupForm.onsubmit = handleSignup;
+document.getElementById('email').oninput = (e) => state.formData.email = e.target.value;
+document.getElementById('password').oninput = (e) => state.formData.password = e.target.value;
+document.getElementById('confirm-password').oninput = (e) => state.formData.confirmPassword = e.target.value;
+document.getElementById('toggle-pwd')?.addEventListener('click', () => {
+state.showPassword = !state.showPassword;
+render();
+});
+document.getElementById('toggle-confirm-pwd')?.addEventListener('click', () => {
+state.showConfirmPassword = !state.showConfirmPassword;
+render();
+});
+document.getElementById('go-login')?.addEventListener('click', () => {
+state.view = 'login';
+render();
+});
+}
+// Terms
+document.getElementById('accept-terms')?.addEventListener('change', (e) => {
+state.acceptedTerms = e.target.checked;
+render();
+});
+document.getElementById('accept-btn')?.addEventListener('click', handleAcceptTerms);
+// Dashboard
+document.getElementById('new-vacancy')?.addEventListener('click', () => {
+state.view = 'form';
+resetJobForm();
+clearAIData();
+render();
+});
+document.getElementById('user-menu')?.addEventListener('click', () => {
+state.menuOpen = !state.menuOpen;
+render();
+});
+document.getElementById('logout')?.addEventListener('click', handleLogout);
+document.getElementById('delete-account')?.addEventListener('click', handleDeleteAccount);
+document.getElementById('go-login')?.addEventListener('click', () => {
+state.view = 'login';
+render();
+});
+document.getElementById('go-signup-from-empty')?.addEventListener('click', () => {
+state.view = 'signup';
+render();
+});
+// Vacancy cards
+document.querySelectorAll('[data-edit]').forEach(btn => {
+btn.addEventListener('click', () => handleEditVacancy(btn.dataset.edit));
+});
+document.querySelectorAll('[data-delete]').forEach(btn => {
+btn.addEventListener('click', () => handleDeleteVacancy(btn.dataset.delete));
+});
+// Form
+const vacancyForm = document.getElementById('vacancy-form');
+if (vacancyForm) {
+vacancyForm.onsubmit = handleSaveVacancy;
+document.getElementById('img').onchange = handleImageUpload;
+document.getElementById('company').oninput = (e) => state.formData.company = e.target.value;
+document.getElementById('job_title').oninput = (e) => state.formData.job_title = e.target.value;
+document.getElementById('description').oninput = (e) => state.formData.description = e.target.value;
+document.getElementById('location').oninput = (e) => state.formData.location = e.target.value;
+document.getElementById('contact_phone').oninput = (e) => state.formData.contact_phone = e.target.value;
+document.getElementById('publication_date').oninput = (e) => state.formData.publication_date = e.target.value;
+document.getElementById('work_days').oninput = (e) => state.formData.work_days = e.target.value;
+document.getElementById('schedule').oninput = (e) => state.formData.schedule = e.target.value;
+document.getElementById('cancel-btn')?.addEventListener('click', cancelForm);
+document.getElementById('clean-btn')?.addEventListener('click', cleanForm);
+document.getElementById('ai-btn')?.addEventListener('click', toggleAIChat);
+}
+// AI Chat
+document.getElementById('ai-input')?.addEventListener('keypress', (e) => {
+if (e.key === 'Enter' && !e.shiftKey) {
+e.preventDefault();
+sendAIMessage();
+}
+});
+document.getElementById('send-ai')?.addEventListener('click', sendAIMessage);
+document.getElementById('start-ai')?.addEventListener('click', startAutofill);
+document.getElementById('close-ai')?.addEventListener('click', () => {
+state.aiChatOpen = false;
+clearAIData();
+render();
+});
+document.getElementById('close-ai-2')?.addEventListener('click', () => {
+state.aiChatOpen = false;
+clearAIData();
+render();
+});
+document.getElementById('minimize-ai')?.addEventListener('click', () => {
+state.chatMinimized = !state.chatMinimized;
+render();
+});
+document.getElementById('ai-img')?.addEventListener('change', handleAIImageUpload);
+document.getElementById('remove-ai-img')?.addEventListener('click', removeAIImage);
+}
 // ==================== INIT ====================
 async function init() {
-  console.log('🚀 Inicializando...');
-  try {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data?.session?.user) {
-      state.user = data.session.user;
-      const accepted = localStorage.getItem('terms_accepted_' + data.session.user.id);
-      state.acceptedTerms = !!accepted;
-      state.view = accepted ? 'dashboard' : 'terms';
-      await loadVacancies();
-    }
-    
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔐 Auth:', event);
-      
-      if (event === 'SIGNED_OUT' && !state.user) {
-        console.log('⏭️ SIGNED_OUT ignorado - ya procesado');
-        return;
-      }
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        state.user = session.user;
-        state.isGuest = false;
-        const accepted = localStorage.getItem('terms_accepted_' + session.user.id);
-        state.acceptedTerms = !!accepted;
-        state.view = accepted ? 'dashboard' : 'terms';
-        await loadVacancies();
-        hideLoading();
-        render();
-        showModal('success', '¡Bienvenido!', 'Has iniciado sesión correctamente');
-      } else if (event === 'SIGNED_OUT') {
-        if (state.user) {
-          console.log('🔄 SIGNED_OUT detectado - reseteando estado');
-          resetCompleteState();
-          render();
-        }
-      }
-    });
-    
-    supabaseClient
-      .channel('vacancies')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'vacancies' }, async () => {
-        await loadVacancies();
-        if (state.view === 'dashboard') render();
-      })
-      .subscribe();
-    
-    render();
-    console.log('✅ Listo');
-  } catch (error) {
-    console.error('❌ Error init:', error);
-    render();
-  }
+console.log('🚀 Inicializando...');
+try {
+const { data } = await supabaseClient.auth.getSession();
+if (data?.session?.user) {
+state.user = data.session.user;
+const accepted = localStorage.getItem('terms_accepted_' + data.session.user.id);
+state.acceptedTerms = !!accepted;
+state.view = accepted ? 'dashboard' : 'terms';
+await loadVacancies();
 }
-
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+console.log('🔐 Auth:', event);
+if (event === 'SIGNED_OUT' && !state.user) {
+console.log('⏭️ SIGNED_OUT ignorado - ya procesado');
+return;
+}
+if (event === 'SIGNED_IN' && session?.user) {
+state.user = session.user;
+state.isGuest = false;
+const accepted = localStorage.getItem('terms_accepted_' + session.user.id);
+state.acceptedTerms = !!accepted;
+state.view = accepted ? 'dashboard' : 'terms';
+await loadVacancies();
+hideLoading();
+render();
+showModal('success', '¡Bienvenido!', 'Has iniciado sesión correctamente');
+} else if (event === 'SIGNED_OUT') {
+if (state.user) {
+console.log('🔄 SIGNED_OUT detectado - reseteando estado');
+resetCompleteState();
+render();
+}
+}
+});
+supabaseClient
+.channel('vacancies')
+.on('postgres_changes', { event: '*', schema: 'public', table: 'vacancies' }, async () => {
+await loadVacancies();
+if (state.view === 'dashboard') render();
+})
+.subscribe();
+render();
+console.log('✅ Listo');
+} catch (error) {
+console.error('❌ Error init:', error);
+render();
+}
+}
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);
 } else {
-  init();
+init();
 }
 </script>
 </body>
